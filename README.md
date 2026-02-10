@@ -2,128 +2,72 @@
 
 A minimalist, elegant website for Apothecary Candles - handcrafted candles made with love.
 
+## 🌐 Live Website
+
+**Your website is now live at:** `https://ashukla0201.github.io/apothecary_candles/`
+
 ## Features
 
 - **Minimalist Design**: Clean, modern aesthetic with focus on products
 - **Responsive Layout**: Works perfectly on desktop, tablet, and mobile devices
-- **Product Showcase**: Beautiful grid layout for candle products with pricing
+- **Product Showcase**: 17 beautiful candle products with pricing
 - **Founder Story**: Personal touch with founder photo and story
-- **Contact Integration**: Multiple contact methods and payment options
+- **Contact Integration**: WhatsApp ordering and Instagram link
+- **Payment Methods**: UPI, Cards, Bank Transfer, Cash on Delivery
 - **Smooth Animations**: Subtle scroll effects and hover states
-- **WhatsApp Integration**: Direct ordering via WhatsApp
 
-## Files Structure
+## 📱 Contact & Ordering
 
-```
-├── index.html          # Main HTML file
-├── styles.css          # CSS styling
-├── script.js           # JavaScript functionality
-├── README.md           # This file
-├── logo.png            # Your brand logo (to be added)
-├── founder.jpg         # Your founder photo (to be added)
-├── hero-bg.jpg         # Hero background image (to be added)
-├── candle1.jpg         # Product images (to be added)
-├── candle2.jpg
-├── candle3.jpg
-├── candle4.jpg
-├── candle5.jpg
-└── candle6.jpg
-```
+- **WhatsApp**: +91 99563 94794 (Direct ordering)
+- **Instagram**: @apothecary.candles
+- **Email**: hello@apothecarycandles.com
 
-## Setup Instructions
+## 🕯️ Product Collection
 
-### 1. Add Your Images
+1. Lavender Dreams - ₹450
+2. Sandalwood Serenity - ₹550
+3. Rose Garden - ₹500
+4. Coffee Fragrance Candle - ₹460
+5. Vanilla Bean - ₹475
+6. Christmas Tree Candle - ₹550
+7. Jasmine Bliss - ₹525
+8. Coconut Paradise - ₹480
+9. Cinnamon Spice - ₹460
+10. Ocean Breeze - ₹440
+11. Apple Cinnamon - ₹490
+12. Patchouli Earth - ₹520
+13. Lemon Zest - ₹420
+14. Peach Blossom - ₹465
+15. Winter Pine - ₹485
+16. Chocolate Truffle - ₹510
+17. Green Tea - ₹435
 
-You need to add the following images to the same directory as your HTML file:
+## 🛠️ Technologies Used
 
-- **logo.png** - Your brand logo
-- **founder.jpg** - Your photo as founder
-- **hero-bg.jpg** - Background image for hero section
-- **candle1.jpg** through **candle6.jpg** - Your candle product photos
+- **HTML5** - Semantic markup
+- **CSS3** - Modern styling with Grid and Flexbox
+- **JavaScript** - Interactive features and smooth scrolling
+- **Google Fonts** - Playfair Display & Montserrat typography
 
-### 2. Customize Contact Information
+## 🚀 Deployment
 
-Edit the contact details in `index.html`:
+This website is deployed using GitHub Pages and automatically updates when you push changes to the `main` branch.
 
-```html
-<!-- Update these details in the contact section -->
-<p>hello@apothecarycandles.com</p>
-<p>+91 98765 43210</p>
-```
+## 📝 Updates
 
-### 3. Update WhatsApp Number
+To update your website:
+1. Make changes to your files
+2. Commit changes: `git add . && git commit -m "Your update message"`
+3. Push to GitHub: `git push`
+4. Website will automatically update in a few minutes
 
-In `script.js`, update the WhatsApp number:
+## 🎨 Design Elements
 
-```javascript
-const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(message)}`;
-```
+- **Brand Colors**: Warm brown (#8b7355) and clean grays
+- **Typography**: Elegant serif headings with clean sans-serif body
+- **Layout**: Centered content with right-aligned logo background
+- **Images**: High-quality product photography with consistent styling
 
-Replace `919876543210` with your actual WhatsApp number (without + or spaces).
+---
 
-### 4. Customize Products
-
-Edit the product information in `index.html`:
-
-- Update candle names
-- Update descriptions
-- Update prices (currently set in INR)
-- Add/remove product cards as needed
-
-## Product Details
-
-Current products included:
-
-1. **Lavender Dreams** - ₹450
-2. **Sandalwood Serenity** - ₹550
-3. **Rose Garden** - ₹500
-4. **Citrus Burst** - ₹400
-5. **Vanilla Bean** - ₹475
-6. **Eucalyptus Mint** - ₹425
-
-## Payment Methods
-
-The website mentions acceptance of:
-- UPI
-- Credit/Debit Cards
-- Net Banking
-- Cash on Delivery
-
-Update these in the contact section as needed.
-
-## Customization Tips
-
-### Colors
-The main brand color is `#8b7355` (warm brown). You can update this in `styles.css`:
-
-```css
-:root {
-    --primary-color: #8b7355;
-    --secondary-color: #6d5a44;
-}
-```
-
-### Fonts
-The website uses:
-- **Playfair Display** for headings (elegant serif)
-- **Montserrat** for body text (clean sans-serif)
-
-### Responsive Design
-The website is fully responsive and includes:
-- Mobile-first approach
-- Tablet layouts
-- Desktop optimizations
-
-## Launch
-
-To launch your website:
-
-1. Place all files in a web server directory
-2. Add your images
-3. Update contact information
-4. Test all links and buttons
-5. Deploy to your hosting service
-
-## Support
-
-For any issues or customizations, ensure all image files are properly named and placed in the correct directory.
+© 2024 Apothecary Candles. Handcrafted with love in India.
