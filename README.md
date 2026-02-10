@@ -4,7 +4,7 @@ A minimalist, elegant website for Apothecary Candles - handcrafted candles made 
 
 ## 🌐 Live Website
 
-**Your website is now live at:** `https://ashukla0201.github.io/apothecary_candles/`
+**Your website is now live at:** `https://ashukla0201.github.io/apothecarycandles/`
 
 ## Features
 
