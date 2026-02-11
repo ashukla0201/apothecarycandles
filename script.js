@@ -144,11 +144,12 @@ function updateCartDisplay() {
                         <img src="${item.image}" alt="${item.name}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
                         <div class="cart-item-details" style="flex: 1;">
                             <div class="cart-item-name" style="font-weight: bold; margin-bottom: 0.5rem;">${item.name}</div>
-                            <div class="cart-item-price" style="color: #666; margin-bottom: 0.5rem;">₹${item.price}</div>
+                            <div class="cart-item-price" style="color: #666; margin-bottom: 0.5rem;">₹${item.price} each</div>
                             <div class="cart-item-quantity" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; background: #f5f5f5; padding: 0.5rem; border-radius: 5px;">
                                 <button onclick="updateQuantity(${index}, -1)" style="background: #8b7355; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">−</button>
-                                <span style="font-weight: bold; min-width: 30px; text-align: center; font-size: 1.1rem; color: #333;">${item.quantity}</span>
+                                <input type="number" value="${item.quantity}" min="1" max="99" onchange="setQuantity(${index}, this.value)" style="width: 60px; text-align: center; font-weight: bold; font-size: 1.1rem; border: 1px solid #ddd; border-radius: 4px; padding: 0.25rem;">
                                 <button onclick="updateQuantity(${index}, 1)" style="background: #8b7355; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">+</button>
+                                <span style="margin-left: 1rem; font-weight: bold; color: #28a745;">= ₹${itemTotal}</span>
                             </div>
                         </div>
                         <button onclick="removeItem(${index})" style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Remove</button>
@@ -195,6 +196,10 @@ function updateQuantity(index, change) {
         if (cart[index].quantity <= 0) {
             // Remove item if quantity is 0 or less
             removeItem(index);
+        } else if (cart[index].quantity > 99) {
+            // Limit maximum quantity to 99
+            cart[index].quantity = 99;
+            showNotification('Maximum quantity is 99');
         } else {
             // Save and update display
             localStorage.setItem('apothecaryCart', JSON.stringify(cart));
@@ -202,6 +207,30 @@ function updateQuantity(index, change) {
             updateCartDisplay();
             showNotification(`Quantity updated to ${cart[index].quantity}`);
         }
+    }
+}
+
+// Set quantity directly from input
+function setQuantity(index, newQuantity) {
+    console.log('Setting quantity for index:', index, 'newQuantity:', newQuantity);
+    
+    const quantity = parseInt(newQuantity);
+    
+    if (cart[index] && quantity > 0 && quantity <= 99) {
+        cart[index].quantity = quantity;
+        localStorage.setItem('apothecaryCart', JSON.stringify(cart));
+        updateCartCounter();
+        updateCartDisplay();
+        showNotification(`Quantity set to ${quantity}`);
+    } else if (quantity <= 0) {
+        showNotification('Quantity must be at least 1');
+        updateCartDisplay(); // Reset the display
+    } else if (quantity > 99) {
+        showNotification('Maximum quantity is 99');
+        cart[index].quantity = 99;
+        localStorage.setItem('apothecaryCart', JSON.stringify(cart));
+        updateCartCounter();
+        updateCartDisplay();
     }
 }
 
@@ -248,6 +277,7 @@ function showNotification(message) {
 window.removeItem = removeItem;
 window.updateCartDisplay = updateCartDisplay;
 window.updateQuantity = updateQuantity;
+window.setQuantity = setQuantity;
 window.payViaWhatsApp = payViaWhatsApp;
 window.payViaRazorpay = payViaRazorpay;
 
