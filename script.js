@@ -92,6 +92,8 @@ function updateCartDisplay() {
     const cartTotal = document.getElementById('cart-total');
     
     console.log('Updating cart display, cart length:', cart.length);
+    console.log('Cart items element:', cartItems);
+    console.log('Cart total element:', cartTotal);
     
     if (cartItems && cartTotal) {
         if (cart.length === 0) {
@@ -121,12 +123,27 @@ function updateCartDisplay() {
                 `;
             });
             
+            // Add payment options after cart items
+            cartHTML += `
+                <div class="payment-section" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #eee;">
+                    <h4>Payment Options</h4>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button onclick="payViaWhatsApp()" class="btn-whatsapp" style="flex: 1; padding: 1rem; background: #25D366; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem;">
+                            💬 Order via WhatsApp
+                        </button>
+                        <button onclick="payViaRazorpay()" class="btn-razorpay" style="flex: 1; padding: 1rem; background: #3395ff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem;">
+                            💳 Pay Online
+                        </button>
+                    </div>
+                </div>
+            `;
+            
             cartItems.innerHTML = cartHTML;
             cartTotal.textContent = total;
             console.log('Updated cart display with total:', total);
         }
     } else {
-        console.log('Cart display elements not found');
+        console.log('Cart display elements not found - cartItems:', !!cartItems, 'cartTotal:', !!cartTotal);
     }
 }
 
@@ -167,6 +184,122 @@ function showNotification(message) {
 // Make functions globally accessible
 window.removeItem = removeItem;
 window.updateCartDisplay = updateCartDisplay;
+window.payViaWhatsApp = payViaWhatsApp;
+window.payViaRazorpay = payViaRazorpay;
+
+// Payment functions
+function payViaWhatsApp() {
+    if (cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
+    }
+    
+    // Create order message
+    let orderMessage = `🕯️ *New Order - Apothecary Candles*%0A%0A`;
+    orderMessage += `*Order Items:*%0A`;
+    
+    let total = 0;
+    cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        orderMessage += `${item.name} x ${item.quantity} = ₹${itemTotal}%0A`;
+    });
+    
+    orderMessage += `%0A*Total: ₹${total}*%0A%0A`;
+    orderMessage += `Please confirm the order and payment details.%0A%0A`;
+    orderMessage += `*Customer Information Needed:*%0A`;
+    orderMessage += `• Name%0A`;
+    orderMessage += `• Phone Number%0A`;
+    orderMessage += `• Delivery Address`;
+    
+    const whatsappUrl = `https://wa.me/919956394794?text=${orderMessage}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+function payViaRazorpay() {
+    if (cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
+    }
+    
+    // Calculate total amount in paise
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const amountInPaise = total * 100;
+    
+    // Create order description
+    const orderItems = cart.map(item => `${item.name} x ${item.quantity}`).join(', ');
+    
+    const options = {
+        key: 'rzp_test_SEtS6ZUfqY5eIv',
+        amount: amountInPaise,
+        currency: 'INR',
+        name: 'Apothecary Candles',
+        description: orderItems,
+        image: 'https://ashukla0201.github.io/apothecarycandles/logo.jpeg',
+        handler: function (response) {
+            // Payment successful
+            alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+            
+            // Send order confirmation via WhatsApp
+            let confirmationMessage = `✅ *Payment Confirmed*%0A%0A`;
+            confirmationMessage += `Payment ID: ${response.razorpay_payment_id}%0A`;
+            confirmationMessage += `Amount: ₹${total}%0A`;
+            confirmationMessage += `Items: ${orderItems}%0A%0A`;
+            confirmationMessage += `*Customer Information Needed:*%0A`;
+            confirmationMessage += `• Name%0A`;
+            confirmationMessage += `• Phone Number%0A`;
+            confirmationMessage += `• Delivery Address`;
+            
+            const whatsappUrl = `https://wa.me/919956394794?text=${confirmationMessage}`;
+            window.open(whatsappUrl, '_blank');
+            
+            // Clear cart after successful payment
+            setTimeout(() => {
+                cart = [];
+                localStorage.setItem('apothecaryCart', JSON.stringify(cart));
+                updateCartCounter();
+                updateCartDisplay();
+            }, 2000);
+        },
+        prefill: {
+            name: '',
+            email: '',
+            contact: ''
+        },
+        notes: {
+            items: orderItems
+        },
+        theme: {
+            color: '#8b7355'
+        },
+        modal: {
+            backdropclose: false,
+            escape: false,
+            handleback: true
+        },
+        config: {
+            display: {
+                blocks: {
+                    banks: {
+                        name: 'Pay via UPI',
+                        instruments: [
+                            {
+                                method: 'upi'
+                            }
+                        ]
+                    }
+                },
+                sequence: ['block.banks'],
+                preferences: {
+                    show_default_blocks: true
+                }
+            }
+        }
+    };
+    
+    const rzp = new Razorpay(options);
+    rzp.open();
+}
 
 // Checkout functionality
 function proceedToCheckout() {
