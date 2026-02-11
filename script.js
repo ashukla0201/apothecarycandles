@@ -108,6 +108,7 @@ function updateCartDisplay() {
     console.log('Updating cart display, cart length:', cart.length);
     console.log('Cart items element:', cartItems);
     console.log('Cart total element:', cartTotal);
+    console.log('Current cart:', cart);
     
     if (cartItems && cartTotal) {
         if (cart.length === 0) {
@@ -155,6 +156,7 @@ function updateCartDisplay() {
             cartItems.innerHTML = cartHTML;
             cartTotal.textContent = total;
             console.log('Updated cart display with total:', total);
+            console.log('Cart HTML generated:', cartHTML.substring(0, 200) + '...');
         }
     } else {
         console.log('Cart display elements not found - cartItems:', !!cartItems, 'cartTotal:', !!cartTotal);
