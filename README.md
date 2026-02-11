@@ -61,6 +61,10 @@ To update your website:
 3. Push to GitHub: `git push`
 4. Website will automatically update in a few minutes
 
+## 👤 Founder
+
+*Aditi Shukla - Founder, Apothecary Candles*
+
 ## 🎨 Design Elements
 
 - **Brand Colors**: Warm brown (#8b7355) and clean grays
