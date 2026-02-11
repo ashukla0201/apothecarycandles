@@ -132,6 +132,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup address autocomplete (demo version for now)
     setupDemoAutocomplete();
+    
+    // Setup pincode to state auto-detection
+    setupPincodeStateDetection();
 });
 
 // Initialize Google Maps Places autocomplete
@@ -561,6 +564,547 @@ window.selectAddress = function(address, pincode) {
     showNotification('Address selected successfully!');
 };
 
+// Setup pincode to state auto-detection
+function setupPincodeStateDetection() {
+    console.log('Setting up pincode to state detection...');
+    
+    const pincodeInput = document.getElementById('customer-pincode');
+    const stateInput = document.getElementById('customer-state');
+    
+    if (!pincodeInput || !stateInput) {
+        console.log('Pincode or state input not found');
+        return;
+    }
+    
+    // Comprehensive pincode to state mapping (first 2-3 digits determine state)
+    const pincodeStateMap = {
+        // Delhi (11)
+        '110': 'Delhi',
+        '11': 'Delhi',
+        
+        // Haryana (12-13)
+        '121': 'Haryana', // Faridabad
+        '122': 'Haryana', // Gurgaon, Palwal
+        '123': 'Haryana', // Rewari
+        '124': 'Haryana', // Rohtak, Jhajjar
+        '125': 'Haryana', // Sonipat, Panipat
+        '126': 'Haryana', // Karnal
+        '127': 'Haryana', // Kurukshetra
+        '128': 'Haryana', // Kaithal
+        '129': 'Haryana', // Jind
+        '130': 'Haryana', // Hisar
+        '131': 'Haryana', // Hansi
+        '132': 'Haryana', // Sirsa
+        '133': 'Haryana', // Fatehabad
+        '134': 'Haryana', // Bhiwani
+        '135': 'Haryana', // Mahendragarh
+        '136': 'Haryana', // Narnaul
+        '13': 'Haryana',
+        
+        // Uttar Pradesh (20-28)
+        '201': 'Uttar Pradesh', // Noida, Ghaziabad
+        '202': 'Uttar Pradesh', // Bulandshahr
+        '203': 'Uttar Pradesh', // Aligarh
+        '204': 'Uttar Pradesh', // Mathura
+        '205': 'Uttar Pradesh', // Agra
+        '206': 'Uttar Pradesh', // Firozabad
+        '207': 'Uttar Pradesh', // Mainpuri
+        '208': 'Uttar Pradesh', // Etawah
+        '209': 'Uttar Pradesh', // Auraiya
+        '210': 'Uttar Pradesh', // Kanpur
+        '211': 'Uttar Pradesh', // Unnao
+        '212': 'Uttar Pradesh', // Kannauj
+        '213': 'Uttar Pradesh', // Farrukhabad
+        '214': 'Uttar Pradesh', // Hardoi
+        '215': 'Uttar Pradesh', // Sitapur
+        '216': 'Uttar Pradesh', // Lakhimpur Kheri
+        '217': 'Uttar Pradesh', // Pilibhit
+        '218': 'Uttar Pradesh', // Shahjahanpur
+        '219': 'Uttar Pradesh', // Bareilly
+        '220': 'Uttar Pradesh', // Badaun
+        '221': 'Uttar Pradesh', // Rampur
+        '222': 'Uttar Pradesh', // Moradabad
+        '223': 'Uttar Pradesh', // Sambhal
+        '224': 'Uttar Pradesh', // Amroha
+        '225': 'Uttar Pradesh', // Meerut
+        '226': 'Uttar Pradesh', // Baghpat
+        '227': 'Uttar Pradesh', // Muzaffarnagar
+        '228': 'Uttar Pradesh', // Saharanpur
+        '229': 'Uttar Pradesh', // Shamli
+        '230': 'Uttar Pradesh', // Lucknow
+        '231': 'Uttar Pradesh', // Barabanki
+        '232': 'Uttar Pradesh', // Faizabad
+        '233': 'Uttar Pradesh', // Ambedkar Nagar
+        '234': 'Uttar Pradesh', // Sultanpur
+        '235': 'Uttar Pradesh', // Pratapgarh
+        '236': 'Uttar Pradesh', // Allahabad
+        '237': 'Uttar Pradesh', // Kaushambi
+        '238': 'Uttar Pradesh', // Chitrakoot
+        '239': 'Uttar Pradesh', // Banda
+        '240': 'Uttar Pradesh', // Hamirpur
+        '241': 'Uttar Pradesh', // Mahoba
+        '242': 'Uttar Pradesh', // Jalaun
+        '243': 'Uttar Pradesh', // Jhansi
+        '244': 'Uttar Pradesh', // Lalitpur
+        '245': 'Uttar Pradesh', // Azamgarh
+        '246': 'Uttar Pradesh', // Mau
+        '247': 'Uttar Pradesh', // Ballia
+        '248': 'Uttar Pradesh', // Ghazipur
+        '249': 'Uttar Pradesh', // Chandauli
+        '250': 'Uttar Pradesh', // Varanasi
+        '251': 'Uttar Pradesh', // Jaunpur
+        '252': 'Uttar Pradesh', // Ghazipur
+        '253': 'Uttar Pradesh', // Sant Ravidas Nagar
+        '254': 'Uttar Pradesh', // Mirzapur
+        '255': 'Uttar Pradesh', // Sonbhadra
+        '256': 'Uttar Pradesh', // Basti
+        '257': 'Uttar Pradesh', // Siddharthnagar
+        '258': 'Uttar Pradesh', // Sant Kabir Nagar
+        '259': 'Uttar Pradesh', // Maharajganj
+        '260': 'Uttar Pradesh', // Gorakhpur
+        '261': 'Uttar Pradesh', // Kushinagar
+        '262': 'Uttar Pradesh', // Deoria
+        '263': 'Uttar Pradesh', // Gonda
+        '264': 'Uttar Pradesh', // Bahraich
+        '265': 'Uttar Pradesh', // Shrawasti
+        '266': 'Uttar Pradesh', // Balrampur
+        '267': 'Uttar Pradesh', // Gonda
+        '268': 'Uttar Pradesh', // Bahraich
+        '269': 'Uttar Pradesh', // Shravasti
+        '270': 'Uttar Pradesh', // Bareilly
+        '271': 'Uttar Pradesh', // Pilibhit
+        '272': 'Uttar Pradesh', // Shahjahanpur
+        '273': 'Uttar Pradesh', // Kheri
+        '274': 'Uttar Pradesh', // Lakhimpur
+        '275': 'Uttar Pradesh', // Sitapur
+        '276': 'Uttar Pradesh', // Hardoi
+        '277': 'Uttar Pradesh', // Unnao
+        '278': 'Uttar Pradesh', // Kanpur Rural
+        '279': 'Uttar Pradesh', // Kanpur Nagar
+        '280': 'Uttar Pradesh', // Kanpur
+        '281': 'Uttar Pradesh', // Kanpur Dehat
+        '282': 'Uttar Pradesh', // Jalaun
+        '283': 'Uttar Pradesh', // Jhansi
+        '284': 'Uttar Pradesh', // Lalitpur
+        '285': 'Uttar Pradesh', // Hamirpur
+        '286': 'Uttar Pradesh', // Mahoba
+        '287': 'Uttar Pradesh', // Banda
+        '288': 'Uttar Pradesh', // Chitrakoot
+        '289': 'Uttar Pradesh', // Kaushambi
+        '290': 'Uttar Pradesh', // Allahabad
+        '291': 'Uttar Pradesh', // Fatehpur
+        '292': 'Uttar Pradesh', // Pratapgarh
+        '293': 'Uttar Pradesh', // Kaushambi
+        '294': 'Uttar Pradesh', // Sultanpur
+        '295': 'Uttar Pradesh', // Ambedkar Nagar
+        '296': 'Uttar Pradesh', // Bahraich
+        '297': 'Uttar Pradesh', // Shrawasti
+        '298': 'Uttar Pradesh', // Balrampur
+        '299': 'Uttar Pradesh', // Gonda
+        '2': 'Uttar Pradesh',
+        
+        // Maharashtra (40-44)
+        '400': 'Maharashtra', // Mumbai
+        '401': 'Maharashtra', // Mumbai suburban
+        '402': 'Maharashtra', // Raigad
+        '403': 'Maharashtra', // Thane
+        '404': 'Maharashtra', // Raigad
+        '405': 'Maharashtra', // Pune
+        '410': 'Maharashtra', // Pune
+        '411': 'Maharashtra', // Pune
+        '412': 'Maharashtra', // Pune
+        '413': 'Maharashtra', // Pune
+        '414': 'Maharashtra', // Pune
+        '415': 'Maharashtra', // Satara
+        '416': 'Maharashtra', // Sangli
+        '417': 'Maharashtra', // Kolhapur
+        '418': 'Maharashtra', // Ratnagiri
+        '419': 'Maharashtra', // Sindhudurg
+        '420': 'Maharashtra', // Nashik
+        '421': 'Maharashtra', // Nashik
+        '422': 'Maharashtra', // Ahmednagar
+        '423': 'Maharashtra', // Aurangabad
+        '424': 'Maharashtra', // Jalna
+        '425': 'Maharashtra', // Parbhani
+        '426': 'Maharashtra', // Beed
+        '427': 'Maharashtra', // Nanded
+        '428': 'Maharashtra', // Latur
+        '429': 'Maharashtra', // Osmanabad
+        '430': 'Maharashtra', // Solapur
+        '431': 'Maharashtra', // Solapur
+        '432': 'Maharashtra', // Sangli
+        '433': 'Maharashtra', // Kolhapur
+        '434': 'Maharashtra', // Ratnagiri
+        '435': 'Maharashtra', // Sindhudurg
+        '436': 'Maharashtra', // Thane
+        '437': 'Maharashtra', // Mumbai
+        '438': 'Maharashtra', // Mumbai
+        '439': 'Maharashtra', // Mumbai
+        '440': 'Maharashtra', // Nagpur
+        '441': 'Maharashtra', // Nagpur
+        '442': 'Maharashtra', // Wardha
+        '443': 'Maharashtra', // Amravati
+        '444': 'Maharashtra', // Akola
+        '445': 'Maharashtra', // Buldhana
+        '446': 'Maharashtra', // Jalgaon
+        '447': 'Maharashtra', // Dhule
+        '448': 'Maharashtra', // Nandurbar
+        '449': 'Maharashtra', // Nashik
+        '4': 'Maharashtra',
+        
+        // Karnataka (56-59)
+        '560': 'Karnataka', // Bangalore
+        '561': 'Karnataka', // Bangalore Rural
+        '562': 'Karnataka', // Bangalore Rural
+        '563': 'Karnataka', // Bangalore Rural
+        '571': 'Karnataka', // Chikballapur
+        '572': 'Karnataka', // Tumkur
+        '573': 'Karnataka', // Mandya
+        '574': 'Karnataka', // Mysore
+        '575': 'Karnataka', // Hassan
+        '576': 'Karnataka', // Chikmagalur
+        '577': 'Karnataka', // Shimoga
+        '578': 'Karnataka', // Davangere
+        '579': 'Karnataka', // Bellary
+        '580': 'Karnataka', // Raichur
+        '581': 'Karnataka', // Dharwad
+        '582': 'Karnataka', // Gadag
+        '583': 'Karnataka', // Belgaum
+        '584': 'Karnataka', // Bijapur
+        '585': 'Karnataka', // Bagalkot
+        '586': 'Karnataka', // Gulbarga
+        '587': 'Karnataka', // Bidar
+        '588': 'Karnataka', // Raichur
+        '589': 'Karnataka', // Koppal
+        '590': 'Karnataka', // Uttar Kannada
+        '591': 'Karnataka', // Dharwad
+        '592': 'Karnataka', // Belgaum
+        '593': 'Karnataka', // Bijapur
+        '594': 'Karnataka', // Bagalkot
+        '595': 'Karnataka', // Gulbarga
+        '596': 'Karnataka', // Bidar
+        '597': 'Karnataka', // Raichur
+        '598': 'Karnataka', // Koppal
+        '599': 'Karnataka', // Bellary
+        '5': 'Karnataka',
+        
+        // Tamil Nadu (60-64)
+        '600': 'Tamil Nadu', // Chennai
+        '601': 'Tamil Nadu', // Chennai
+        '602': 'Tamil Nadu', // Chennai
+        '603': 'Tamil Nadu', // Chennai
+        '604': 'Tamil Nadu', // Chennai
+        '605': 'Tamil Nadu', // Chennai
+        '606': 'Tamil Nadu', // Chennai
+        '607': 'Tamil Nadu', // Chennai
+        '608': 'Tamil Nadu', // Chennai
+        '609': 'Tamil Nadu', // Chennai
+        '610': 'Tamil Nadu', // Chennai
+        '611': 'Tamil Nadu', // Chennai
+        '612': 'Tamil Nadu', // Chennai
+        '613': 'Tamil Nadu', // Chennai
+        '614': 'Tamil Nadu', // Chennai
+        '615': 'Tamil Nadu', // Chennai
+        '616': 'Tamil Nadu', // Chennai
+        '617': 'Tamil Nadu', // Chennai
+        '618': 'Tamil Nadu', // Chennai
+        '619': 'Tamil Nadu', // Chennai
+        '620': 'Tamil Nadu', // Chennai
+        '621': 'Tamil Nadu', // Chennai
+        '622': 'Tamil Nadu', // Chennai
+        '623': 'Tamil Nadu', // Chennai
+        '624': 'Tamil Nadu', // Chennai
+        '625': 'Tamil Nadu', // Chennai
+        '626': 'Tamil Nadu', // Chennai
+        '627': 'Tamil Nadu', // Chennai
+        '628': 'Tamil Nadu', // Chennai
+        '629': 'Tamil Nadu', // Chennai
+        '630': 'Tamil Nadu', // Chennai
+        '631': 'Tamil Nadu', // Chennai
+        '632': 'Tamil Nadu', // Chennai
+        '633': 'Tamil Nadu', // Chennai
+        '634': 'Tamil Nadu', // Chennai
+        '635': 'Tamil Nadu', // Chennai
+        '636': 'Tamil Nadu', // Chennai
+        '637': 'Tamil Nadu', // Chennai
+        '638': 'Tamil Nadu', // Chennai
+        '639': 'Tamil Nadu', // Chennai
+        '640': 'Tamil Nadu', // Chennai
+        '641': 'Tamil Nadu', // Chennai
+        '642': 'Tamil Nadu', // Chennai
+        '643': 'Tamil Nadu', // Chennai
+        '644': 'Tamil Nadu', // Chennai
+        '645': 'Tamil Nadu', // Chennai
+        '646': 'Tamil Nadu', // Chennai
+        '647': 'Tamil Nadu', // Chennai
+        '648': 'Tamil Nadu', // Chennai
+        '649': 'Tamil Nadu', // Chennai
+        '650': 'Tamil Nadu', // Chennai
+        '651': 'Tamil Nadu', // Chennai
+        '652': 'Tamil Nadu', // Chennai
+        '653': 'Tamil Nadu', // Chennai
+        '654': 'Tamil Nadu', // Chennai
+        '655': 'Tamil Nadu', // Chennai
+        '656': 'Tamil Nadu', // Chennai
+        '657': 'Tamil Nadu', // Chennai
+        '658': 'Tamil Nadu', // Chennai
+        '659': 'Tamil Nadu', // Chennai
+        '6': 'Tamil Nadu',
+        
+        // West Bengal (70-74)
+        '700': 'West Bengal', // Kolkata
+        '701': 'West Bengal', // Kolkata
+        '702': 'West Bengal', // Kolkata
+        '703': 'West Bengal', // Kolkata
+        '704': 'West Bengal', // Kolkata
+        '705': 'West Bengal', // Kolkata
+        '706': 'West Bengal', // Kolkata
+        '707': 'West Bengal', // Kolkata
+        '708': 'West Bengal', // Kolkata
+        '709': 'West Bengal', // Kolkata
+        '710': 'West Bengal', // Kolkata
+        '711': 'West Bengal', // Howrah
+        '712': 'West Bengal', // Hooghly
+        '713': 'West Bengal', // Burdwan
+        '714': 'West Bengal', // Birbhum
+        '715': 'West Bengal', // Murshidabad
+        '716': 'West Bengal', // Nadia
+        '717': 'West Bengal', // North 24 Parganas
+        '718': 'West Bengal', // South 24 Parganas
+        '719': 'West Bengal', // Kolkata
+        '720': 'West Bengal', // Purulia
+        '721': 'West Bengal', // Bankura
+        '722': 'West Bengal', // Midnapore
+        '723': 'West Bengal', // Midnapore
+        '724': 'West Bengal', // Midnapore
+        '725': 'West Bengal', // Midnapore
+        '726': 'West Bengal', // Midnapore
+        '727': 'West Bengal', // Midnapore
+        '728': 'West Bengal', // Midnapore
+        '729': 'West Bengal', // Midnapore
+        '730': 'West Bengal', // Midnapore
+        '731': 'West Bengal', // Midnapore
+        '732': 'West Bengal', // Midnapore
+        '733': 'West Bengal', // Midnapore
+        '734': 'West Bengal', // Midnapore
+        '735': 'West Bengal', // Midnapore
+        '736': 'West Bengal', // Midnapore
+        '737': 'West Bengal', // Midnapore
+        '738': 'West Bengal', // Midnapore
+        '739': 'West Bengal', // Midnapore
+        '740': 'West Bengal', // Midnapore
+        '741': 'West Bengal', // Midnapore
+        '742': 'West Bengal', // Midnapore
+        '743': 'West Bengal', // Midnapore
+        '744': 'West Bengal', // Midnapore
+        '745': 'West Bengal', // Midnapore
+        '746': 'West Bengal', // Midnapore
+        '747': 'West Bengal', // Midnapore
+        '748': 'West Bengal', // Midnapore
+        '749': 'West Bengal', // Midnapore
+        '7': 'West Bengal',
+        
+        // Gujarat (38-39)
+        '380': 'Gujarat', // Ahmedabad
+        '381': 'Gujarat', // Ahmedabad
+        '382': 'Gujarat', // Ahmedabad
+        '383': 'Gujarat', // Ahmedabad
+        '384': 'Gujarat', // Ahmedabad
+        '385': 'Gujarat', // Ahmedabad
+        '386': 'Gujarat', // Ahmedabad
+        '387': 'Gujarat', // Ahmedabad
+        '388': 'Gujarat', // Ahmedabad
+        '389': 'Gujarat', // Ahmedabad
+        '390': 'Gujarat', // Vadodara
+        '391': 'Gujarat', // Vadodara
+        '392': 'Gujarat', // Vadodara
+        '393': 'Gujarat', // Vadodara
+        '394': 'Gujarat', // Vadodara
+        '395': 'Gujarat', // Vadodara
+        '396': 'Gujarat', // Rajkot
+        '397': 'Gujarat', // Rajkot
+        '398': 'Gujarat', // Rajkot
+        '399': 'Gujarat', // Rajkot
+        '3': 'Gujarat',
+        
+        // Rajasthan (30-34)
+        '300': 'Rajasthan', // Jaipur
+        '301': 'Rajasthan', // Jaipur
+        '302': 'Rajasthan', // Jaipur
+        '303': 'Rajasthan', // Jaipur
+        '304': 'Rajasthan', // Jaipur
+        '305': 'Rajasthan', // Jaipur
+        '306': 'Rajasthan', // Jaipur
+        '307': 'Rajasthan', // Jaipur
+        '308': 'Rajasthan', // Jaipur
+        '309': 'Rajasthan', // Jaipur
+        '310': 'Rajasthan', // Jaipur
+        '311': 'Rajasthan', // Jaipur
+        '312': 'Rajasthan', // Jaipur
+        '313': 'Rajasthan', // Jaipur
+        '314': 'Rajasthan', // Jaipur
+        '315': 'Rajasthan', // Jaipur
+        '316': 'Rajasthan', // Jaipur
+        '317': 'Rajasthan', // Jaipur
+        '318': 'Rajasthan', // Jaipur
+        '319': 'Rajasthan', // Jaipur
+        '320': 'Rajasthan', // Jaipur
+        '321': 'Rajasthan', // Jaipur
+        '322': 'Rajasthan', // Jaipur
+        '323': 'Rajasthan', // Jaipur
+        '324': 'Rajasthan', // Jaipur
+        '325': 'Rajasthan', // Jaipur
+        '326': 'Rajasthan', // Jaipur
+        '327': 'Rajasthan', // Jaipur
+        '328': 'Rajasthan', // Jaipur
+        '329': 'Rajasthan', // Jaipur
+        '330': 'Rajasthan', // Jaipur
+        '331': 'Rajasthan', // Jaipur
+        '332': 'Rajasthan', // Jaipur
+        '333': 'Rajasthan', // Jaipur
+        '334': 'Rajasthan', // Jaipur
+        '335': 'Rajasthan', // Jaipur
+        '336': 'Rajasthan', // Jaipur
+        '337': 'Rajasthan', // Jaipur
+        '338': 'Rajasthan', // Jaipur
+        '339': 'Rajasthan', // Jaipur
+        '340': 'Rajasthan', // Jaipur
+        '341': 'Rajasthan', // Jaipur
+        '342': 'Rajasthan', // Jaipur
+        '343': 'Rajasthan', // Jaipur
+        '344': 'Rajasthan', // Jaipur
+        '345': 'Rajasthan', // Jaipur
+        '346': 'Rajasthan', // Jaipur
+        '347': 'Rajasthan', // Jaipur
+        '348': 'Rajasthan', // Jaipur
+        '349': 'Rajasthan', // Jaipur
+        '3': 'Rajasthan',
+        
+        // Punjab (14-16)
+        '140': 'Punjab', // Amritsar
+        '141': 'Punjab', // Amritsar
+        '142': 'Punjab', // Amritsar
+        '143': 'Punjab', // Amritsar
+        '144': 'Punjab', // Jalandhar
+        '145': 'Punjab', // Jalandhar
+        '146': 'Punjab', // Jalandhar
+        '147': 'Punjab', // Jalandhar
+        '148': 'Punjab', // Ludhiana
+        '149': 'Punjab', // Ludhiana
+        '150': 'Punjab', // Ludhiana
+        '151': 'Punjab', // Ludhiana
+        '152': 'Punjab', // Ludhiana
+        '153': 'Punjab', // Ludhiana
+        '154': 'Punjab', // Ludhiana
+        '155': 'Punjab', // Ludhiana
+        '156': 'Punjab', // Ludhiana
+        '157': 'Punjab', // Ludhiana
+        '158': 'Punjab', // Ludhiana
+        '159': 'Punjab', // Ludhiana
+        '160': 'Punjab', // Chandigarh
+        '161': 'Punjab', // Chandigarh
+        '162': 'Punjab', // Chandigarh
+        '163': 'Punjab', // Chandigarh
+        '164': 'Punjab', // Chandigarh
+        '165': 'Punjab', // Chandigarh
+        '166': 'Punjab', // Chandigarh
+        '167': 'Punjab', // Chandigarh
+        '168': 'Punjab', // Chandigarh
+        '169': 'Punjab', // Chandigarh
+        '1': 'Punjab',
+        
+        // Telangana (50)
+        '500': 'Telangana', // Hyderabad
+        '501': 'Telangana', // Hyderabad
+        '502': 'Telangana', // Hyderabad
+        '503': 'Telangana', // Hyderabad
+        '504': 'Telangana', // Hyderabad
+        '505': 'Telangana', // Hyderabad
+        '506': 'Telangana', // Hyderabad
+        '507': 'Telangana', // Hyderabad
+        '508': 'Telangana', // Hyderabad
+        '509': 'Telangana', // Hyderabad
+        '5': 'Telangana'
+    };
+    
+    // Function to detect state from pincode
+    function detectStateFromPincode(pincode) {
+        if (!pincode || pincode.length !== 6) {
+            return '';
+        }
+        
+        // Try exact 3-digit match first
+        const first3 = pincode.substring(0, 3);
+        if (pincodeStateMap[first3]) {
+            return pincodeStateMap[first3];
+        }
+        
+        // Try exact 2-digit match
+        const first2 = pincode.substring(0, 2);
+        if (pincodeStateMap[first2]) {
+            return pincodeStateMap[first2];
+        }
+        
+        // Try 1-digit match
+        const first1 = pincode.substring(0, 1);
+        if (pincodeStateMap[first1]) {
+            return pincodeStateMap[first1];
+        }
+        
+        return '';
+    }
+    
+    // Add input event listener to pincode field
+    pincodeInput.addEventListener('input', function() {
+        const pincode = this.value.trim();
+        
+        if (pincode.length === 6) {
+            const detectedState = detectStateFromPincode(pincode);
+            
+            if (detectedState) {
+                stateInput.value = detectedState;
+                stateInput.style.borderColor = '#28a745';
+                stateInput.style.backgroundColor = '#d4edda';
+                console.log('State detected:', detectedState, 'for pincode:', pincode);
+                showNotification(`State detected: ${detectedState}`);
+            } else {
+                stateInput.value = 'Unknown State';
+                stateInput.style.borderColor = '#dc3545';
+                stateInput.style.backgroundColor = '#f8d7da';
+                console.log('State not detected for pincode:', pincode);
+                showNotification('State not found for this pincode');
+            }
+        } else {
+            // Clear state if pincode is not 6 digits
+            stateInput.value = '';
+            stateInput.style.borderColor = '#ddd';
+            stateInput.style.backgroundColor = '#f8f9fa';
+        }
+    });
+    
+    // Also update state when address is selected from autocomplete
+    const originalSelectAddress = window.selectAddress;
+    window.selectAddress = function(address, pincode) {
+        // Call original function
+        if (originalSelectAddress) {
+            originalSelectAddress(address, pincode);
+        }
+        
+        // Update state based on pincode
+        if (pincode) {
+            const detectedState = detectStateFromPincode(pincode);
+            if (detectedState) {
+                stateInput.value = detectedState;
+                stateInput.style.borderColor = '#28a745';
+                stateInput.style.backgroundColor = '#d4edda';
+                console.log('State auto-updated:', detectedState, 'for pincode:', pincode);
+            }
+        }
+    };
+    
+    console.log('Pincode to state detection setup complete');
+}
+
 // Setup lightbox functionality
 function setupLightbox() {
     console.log('Setting up lightbox functionality...');
@@ -979,6 +1523,7 @@ function validateCustomerDetails() {
     const customerName = document.getElementById('customer-name').value.trim();
     const customerEmail = document.getElementById('customer-email').value.trim();
     const customerPincode = document.getElementById('customer-pincode').value.trim();
+    const customerState = document.getElementById('customer-state').value.trim();
     const customerAddress = document.getElementById('customer-address').value.trim();
     
     // Get phone number with country code
@@ -1006,6 +1551,7 @@ function validateCustomerDetails() {
         customerPhone, 
         selectedCountry,
         customerPincode, 
+        customerState,
         customerAddress,
         placeId,
         formattedAddress 
@@ -1041,6 +1587,13 @@ function validateCustomerDetails() {
         return false;
     }
     
+    // Validate state (must be auto-detected)
+    if (!customerState || customerState === 'Unknown State') {
+        showNotification('Please enter a valid Indian pincode to auto-detect state');
+        document.getElementById('customer-pincode').focus();
+        return false;
+    }
+    
     // Validate address (minimum 10 characters or Google Places selected)
     if ((!customerAddress || customerAddress.length < 10) && !placeId) {
         showNotification('Please enter a complete delivery address (minimum 10 characters) or select from suggestions');
@@ -1054,6 +1607,7 @@ function validateCustomerDetails() {
         customerPhone,
         selectedCountry,
         customerPincode,
+        customerState,
         customerAddress: formattedAddress,
         placeId
     };
@@ -1079,6 +1633,7 @@ function processWhatsAppPayment() {
     orderMessage += `• Phone: ${customerDetails.customerPhone}%0A`;
     orderMessage += `• Country: ${customerDetails.selectedCountry || 'Not specified'}%0A`;
     orderMessage += `• Pincode: ${customerDetails.customerPincode}%0A`;
+    orderMessage += `• State: ${customerDetails.customerState}%0A`;
     orderMessage += `• Address: ${customerDetails.customerAddress}%0A%0A`;
     orderMessage += `*Order Items:*%0A`;
     
@@ -1136,6 +1691,7 @@ function processRazorpayPayment() {
             confirmationMessage += `• Phone: ${customerDetails.customerPhone}%0A`;
             confirmationMessage += `• Country: ${customerDetails.selectedCountry || 'Not specified'}%0A`;
             confirmationMessage += `• Pincode: ${customerDetails.customerPincode}%0A`;
+            confirmationMessage += `• State: ${customerDetails.customerState}%0A`;
             confirmationMessage += `• Address: ${customerDetails.customerAddress}%0A%0A`;
             confirmationMessage += `*Payment Details:*%0A`;
             confirmationMessage += `Payment ID: ${response.razorpay_payment_id}%0A`;
@@ -1165,6 +1721,7 @@ function processRazorpayPayment() {
             customer_phone: customerDetails.customerPhone,
             customer_country: customerDetails.selectedCountry || 'Not specified',
             customer_pincode: customerDetails.customerPincode,
+            customer_state: customerDetails.customerState,
             customer_address: customerDetails.customerAddress,
             items: orderItems
         },

@@ -351,6 +351,11 @@
                                 <small style="color: #666; font-size: 0.85rem;">Please enter a 6-digit pincode</small>
                             </div>
                             <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label for="customer-state" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #555;">State <span style="color: #888;">(Auto-populated)</span></label>
+                                <input type="text" id="customer-state" readonly placeholder="State will be auto-detected from pincode" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; background-color: #f8f9fa; color: #333;">
+                                <small style="color: #666; font-size: 0.85rem;">State is automatically detected based on your pincode</small>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
                                 <label for="customer-address" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #555;">Delivery Address <span style="color: red;">*</span></label>
                                 <div style="position: relative;">
                                     <input type="text" id="customer-address" required placeholder="Start typing your address (e.g., Vaishno Silver Bells)" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; resize: vertical;">
