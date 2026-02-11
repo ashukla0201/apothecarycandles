@@ -104,6 +104,29 @@ document.querySelectorAll('.razorpay-payment').forEach(button => {
             },
             theme: {
                 color: '#8b7355'
+            },
+            modal: {
+                backdropclose: false,
+                escape: false,
+                handleback: true
+            },
+            config: {
+                display: {
+                    blocks: {
+                        banks: {
+                            name: 'Pay via UPI',
+                            instruments: [
+                                {
+                                    method: 'upi'
+                                }
+                            ]
+                        }
+                    },
+                    sequence: ['block.banks'],
+                    preferences: {
+                        show_default_blocks: true
+                    }
+                }
             }
         };
         
