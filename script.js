@@ -12,22 +12,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Buy button functionality
-document.querySelectorAll('.buy-button').forEach(button => {
-    button.addEventListener('click', function() {
-        const productCard = this.closest('.product-card');
-        const productName = productCard.querySelector('h3').textContent;
-        const price = productCard.querySelector('.price').textContent;
-        
-        // Create order message
-        const message = `I would like to order: ${productName} - ${price}`;
-        
-        // Open WhatsApp with pre-filled message
-        const whatsappUrl = `https://wa.me/919956394794?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
-    });
-});
-
 // Add scroll effect to header
 window.addEventListener('scroll', function() {
     const header = document.querySelector('header');
