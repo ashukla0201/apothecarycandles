@@ -201,14 +201,31 @@ function proceedToCheckout() {
     }
     
     // Hide cart section, show checkout section
-    document.getElementById('cart').style.display = 'none';
-    document.getElementById('checkout').style.display = 'block';
+    const cartSection = document.getElementById('cart');
+    const checkoutSection = document.getElementById('checkout');
+    
+    console.log('Cart section:', cartSection);
+    console.log('Checkout section:', checkoutSection);
+    
+    if (cartSection) {
+        cartSection.style.display = 'none';
+        console.log('Hidden cart section');
+    }
+    
+    if (checkoutSection) {
+        checkoutSection.style.display = 'block';
+        console.log('Showing checkout section');
+    }
     
     // Update checkout items
     updateCheckoutUI();
     
-    // Scroll to checkout
-    document.getElementById('checkout').scrollIntoView({ behavior: 'smooth' });
+    // Scroll to checkout smoothly
+    setTimeout(() => {
+        if (checkoutSection) {
+            checkoutSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 100);
 }
 
 // Update checkout UI
@@ -245,6 +262,32 @@ function updateCheckoutUI() {
     checkoutTotal.textContent = total;
     
     console.log('Checkout UI updated with total:', total);
+}
+
+// Back to cart
+function backToCart() {
+    console.log('Going back to cart...');
+    
+    // Hide checkout section, show cart section
+    const cartSection = document.getElementById('cart');
+    const checkoutSection = document.getElementById('checkout');
+    
+    if (checkoutSection) {
+        checkoutSection.style.display = 'none';
+        console.log('Hidden checkout section');
+    }
+    
+    if (cartSection) {
+        cartSection.style.display = 'block';
+        console.log('Showing cart section');
+    }
+    
+    // Scroll to cart
+    setTimeout(() => {
+        if (cartSection) {
+            cartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 100);
 }
 
 // Update quantity
@@ -340,6 +383,7 @@ window.updateCartDisplay = updateCartDisplay;
 window.updateQuantity = updateQuantity;
 window.setQuantity = setQuantity;
 window.proceedToCheckout = proceedToCheckout;
+window.backToCart = backToCart;
 window.payViaWhatsApp = payViaWhatsApp;
 window.payViaRazorpay = payViaRazorpay;
 window.processWhatsAppPayment = processWhatsAppPayment;
@@ -353,22 +397,16 @@ function payViaWhatsApp() {
         return;
     }
     
-    // Always redirect to checkout first
-    proceedToCheckout();
-    
-    // Focus on the first empty field
-    setTimeout(() => {
-        const customerName = document.getElementById('customer-name').value;
-        if (!customerName) {
-            document.getElementById('customer-name').focus();
-        } else {
-            const customerEmail = document.getElementById('customer-email').value;
-            if (!customerEmail) {
-                document.getElementById('customer-email').focus();
-            }
-        }
-        showNotification('Please fill in your details to complete the order');
-    }, 500);
+    // Check if we're already on checkout page
+    const checkoutSection = document.getElementById('checkout');
+    if (!checkoutSection || checkoutSection.style.display === 'none') {
+        // Redirect to checkout first
+        proceedToCheckout();
+        showNotification('Please fill in your details below to complete the order');
+    } else {
+        // We're already on checkout, just show message
+        showNotification('Please fill in your details below to complete the order');
+    }
 }
 
 function payViaRazorpay() {
@@ -378,22 +416,16 @@ function payViaRazorpay() {
         return;
     }
     
-    // Always redirect to checkout first
-    proceedToCheckout();
-    
-    // Focus on the first empty field
-    setTimeout(() => {
-        const customerName = document.getElementById('customer-name').value;
-        if (!customerName) {
-            document.getElementById('customer-name').focus();
-        } else {
-            const customerEmail = document.getElementById('customer-email').value;
-            if (!customerEmail) {
-                document.getElementById('customer-email').focus();
-            }
-        }
-        showNotification('Please fill in your details to proceed with payment');
-    }, 500);
+    // Check if we're already on checkout page
+    const checkoutSection = document.getElementById('checkout');
+    if (!checkoutSection || checkoutSection.style.display === 'none') {
+        // Redirect to checkout first
+        proceedToCheckout();
+        showNotification('Please fill in your details below to proceed with payment');
+    } else {
+        // We're already on checkout, just show message
+        showNotification('Please fill in your details below to proceed with payment');
+    }
 }
 
 // Process WhatsApp payment after form is filled
