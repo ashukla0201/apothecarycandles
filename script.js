@@ -129,7 +129,206 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup international telephone input
     setupPhoneInput();
+    
+    // Setup address autocomplete (demo version for now)
+    setupDemoAutocomplete();
 });
+
+// Initialize Google Maps Places autocomplete
+function initAutocomplete() {
+    console.log('Initializing Google Maps Places autocomplete...');
+    
+    const addressInput = document.getElementById('customer-address');
+    const loadingIndicator = document.getElementById('address-loading');
+    
+    if (!addressInput) {
+        console.log('Address input not found');
+        return;
+    }
+    
+    // Create autocomplete instance
+    const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+        types: ['geocode', 'establishment'],
+        fields: ['place_id', 'formatted_address', 'geometry', 'name', 'address_components'],
+        componentRestrictions: { country: ['in', 'us', 'uk', 'ca', 'au'] } // Restrict to major countries
+    });
+    
+    // Show loading indicator when searching
+    addressInput.addEventListener('input', function() {
+        if (this.value.length > 2) {
+            loadingIndicator.style.display = 'block';
+        } else {
+            loadingIndicator.style.display = 'none';
+        }
+    });
+    
+    // Hide loading indicator when place is selected
+    autocomplete.addListener('place_changed', function() {
+        loadingIndicator.style.display = 'none';
+        
+        const place = autocomplete.getPlace();
+        
+        if (!place.place_id) {
+            console.log('No place selected');
+            return;
+        }
+        
+        console.log('Place selected:', place);
+        
+        // Update the input with the formatted address
+        addressInput.value = place.formatted_address;
+        
+        // Extract pincode if available (for Indian addresses)
+        const pincodeComponent = place.address_components.find(component => 
+            component.types.includes('postal_code')
+        );
+        
+        if (pincodeComponent) {
+            const pincodeInput = document.getElementById('customer-pincode');
+            if (pincodeInput && !pincodeInput.value) {
+                pincodeInput.value = pincodeComponent.long_name;
+                console.log('Auto-filled pincode:', pincodeComponent.long_name);
+            }
+        }
+        
+        // Store place data for form submission
+        addressInput.dataset.placeId = place.place_id;
+        addressInput.dataset.formattedAddress = place.formatted_address;
+        
+        showNotification('Address selected successfully!');
+    });
+    
+    // Handle keyboard navigation
+    addressInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            // Prevent form submission when selecting from dropdown
+            e.preventDefault();
+        }
+    });
+    
+    console.log('Google Maps Places autocomplete initialized');
+}
+
+// Demo autocomplete (works without Google Maps API)
+function setupDemoAutocomplete() {
+    console.log('Setting up demo address autocomplete...');
+    
+    const addressInput = document.getElementById('customer-address');
+    const loadingIndicator = document.getElementById('address-loading');
+    
+    if (!addressInput) {
+        console.log('Address input not found');
+        return;
+    }
+    
+    // Sample addresses for demo
+    const sampleAddresses = [
+        { name: 'Vaishno Silver Bells', address: 'Vaishno Silver Bells, Sector 12, Dwarka, Delhi, 110075', pincode: '110075' },
+        { name: 'Vaishno Silver Bells Apartment', address: 'Vaishno Silver Bells Apartment, Plot 12, Dwarka Sector 12, New Delhi, Delhi 110075', pincode: '110075' },
+        { name: 'Silver Bells Society', address: 'Silver Bells Society, Phase 1, Gurgaon, Haryana, 122001', pincode: '122001' },
+        { name: 'DLF Phase 1', address: 'DLF Phase 1, Gurgaon, Haryana, 122001', pincode: '122001' },
+        { name: 'Connaught Place', address: 'Connaught Place, New Delhi, Delhi, 110001', pincode: '110001' },
+        { name: 'Nehru Place', address: 'Nehru Place, New Delhi, Delhi, 110019', pincode: '110019' },
+        { name: 'Rajouri Garden', address: 'Rajouri Garden, New Delhi, Delhi, 110027', pincode: '110027' },
+        { name: 'Karol Bagh', address: 'Karol Bagh, New Delhi, Delhi, 110005', pincode: '110005' },
+        { name: 'Lajpat Nagar', address: 'Lajpat Nagar, New Delhi, Delhi, 110024', pincode: '110024' },
+        { name: 'South Extension', address: 'South Extension, New Delhi, Delhi, 110049', pincode: '110049' }
+    ];
+    
+    let currentTimeout;
+    
+    // Create dropdown container
+    const dropdown = document.createElement('div');
+    dropdown.id = 'address-dropdown';
+    dropdown.style.cssText = `
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    `;
+    
+    addressInput.parentNode.style.position = 'relative';
+    addressInput.parentNode.appendChild(dropdown);
+    
+    // Handle input
+    addressInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        
+        clearTimeout(currentTimeout);
+        
+        if (query.length < 2) {
+            dropdown.style.display = 'none';
+            loadingIndicator.style.display = 'none';
+            return;
+        }
+        
+        // Show loading
+        loadingIndicator.style.display = 'block';
+        
+        // Simulate API delay
+        currentTimeout = setTimeout(() => {
+            loadingIndicator.style.display = 'none';
+            
+            // Filter addresses
+            const matches = sampleAddresses.filter(addr => 
+                addr.name.toLowerCase().includes(query) || 
+                addr.address.toLowerCase().includes(query)
+            );
+            
+            // Show dropdown
+            if (matches.length > 0) {
+                dropdown.innerHTML = matches.map(addr => `
+                    <div style="padding: 10px; border-bottom: 1px solid #f0f0f0; cursor: pointer; hover:background-color:#f8f9fa;" 
+                         onmouseover="this.style.backgroundColor='#f8f9fa'" 
+                         onmouseout="this.style.backgroundColor='white'"
+                         onclick="selectAddress('${addr.address.replace(/'/g, "\\'")}', '${addr.pincode}')">
+                        <div style="font-weight: 600; color: #333;">${addr.name}</div>
+                        <div style="font-size: 0.85rem; color: #666;">${addr.address}</div>
+                    </div>
+                `).join('');
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.innerHTML = '<div style="padding: 10px; color: #666;">No addresses found</div>';
+                dropdown.style.display = 'block';
+            }
+        }, 300);
+    });
+    
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!addressInput.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+    
+    console.log('Demo autocomplete setup complete');
+}
+
+// Global function for address selection
+window.selectAddress = function(address, pincode) {
+    const addressInput = document.getElementById('customer-address');
+    const pincodeInput = document.getElementById('customer-pincode');
+    const dropdown = document.getElementById('address-dropdown');
+    
+    addressInput.value = address;
+    addressInput.dataset.formattedAddress = address;
+    
+    if (pincodeInput && !pincodeInput.value) {
+        pincodeInput.value = pincode;
+    }
+    
+    dropdown.style.display = 'none';
+    showNotification('Address selected successfully!');
+};
 
 // Setup lightbox functionality
 function setupLightbox() {
@@ -565,7 +764,21 @@ function validateCustomerDetails() {
         customerPhone = phoneInput.value.trim();
     }
     
-    console.log('Validating customer details:', { customerName, customerEmail, customerPhone, customerPincode, customerAddress });
+    // Get address details from Google Places if available
+    const addressInput = document.getElementById('customer-address');
+    const placeId = addressInput.dataset.placeId || '';
+    const formattedAddress = addressInput.dataset.formattedAddress || customerAddress;
+    
+    console.log('Validating customer details:', { 
+        customerName, 
+        customerEmail, 
+        customerPhone, 
+        selectedCountry,
+        customerPincode, 
+        customerAddress,
+        placeId,
+        formattedAddress 
+    });
     
     // Validate name (minimum 3 characters)
     if (!customerName || customerName.length < 3) {
@@ -597,9 +810,9 @@ function validateCustomerDetails() {
         return false;
     }
     
-    // Validate address (minimum 10 characters)
-    if (!customerAddress || customerAddress.length < 10) {
-        showNotification('Please enter a complete delivery address (minimum 10 characters)');
+    // Validate address (minimum 10 characters or Google Places selected)
+    if ((!customerAddress || customerAddress.length < 10) && !placeId) {
+        showNotification('Please enter a complete delivery address (minimum 10 characters) or select from suggestions');
         document.getElementById('customer-address').focus();
         return false;
     }
@@ -610,7 +823,8 @@ function validateCustomerDetails() {
         customerPhone,
         selectedCountry,
         customerPincode,
-        customerAddress
+        customerAddress: formattedAddress,
+        placeId
     };
 }
 

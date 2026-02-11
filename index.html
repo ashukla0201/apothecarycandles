@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Google Maps API - Replace YOUR_API_KEY with actual key for production -->
+    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initAutocomplete" async defer></script> -->
 </head>
 <body>
     <!-- Lightbox Modal -->
@@ -350,8 +352,13 @@
                             </div>
                             <div class="form-group" style="margin-bottom: 1.5rem;">
                                 <label for="customer-address" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #555;">Delivery Address <span style="color: red;">*</span></label>
-                                <textarea id="customer-address" rows="3" required placeholder="Complete delivery address with landmark" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; resize: vertical;"></textarea>
-                                <small style="color: #666; font-size: 0.85rem;">Please enter your complete delivery address</small>
+                                <div style="position: relative;">
+                                    <input type="text" id="customer-address" required placeholder="Start typing your address (e.g., Vaishno Silver Bells)" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; resize: vertical;">
+                                    <div id="address-loading" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: none;">
+                                        <div style="width: 20px; height: 20px; border: 2px solid #f3f3f3; border-top: 2px solid #8b7355; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                                    </div>
+                                </div>
+                                <small style="color: #666; font-size: 0.85rem;">Type your apartment name, landmark, or complete address for suggestions</small>
                             </div>
                         </form>
                     </div>
