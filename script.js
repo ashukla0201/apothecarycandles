@@ -136,21 +136,25 @@ function updateCartDisplay() {
                 const itemTotal = item.price * item.quantity;
                 total += itemTotal;
                 
+                console.log('Creating cart item HTML for:', item.name, 'index:', index);
+                
                 cartHTML += `
                     <div class="cart-item">
                         <img src="${item.image}" alt="${item.name}">
                         <div class="cart-item-details">
                             <div class="cart-item-name">${item.name}</div>
                             <div class="cart-item-price">₹${item.price}</div>
-                            <div class="cart-item-quantity">
-                                <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
-                                <span class="quantity-value">${item.quantity}</span>
-                                <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
+                            <div class="cart-item-quantity" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                                <button class="quantity-btn" onclick="updateQuantity(${index}, -1)" style="background: #8b7355; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">−</button>
+                                <span class="quantity-value" style="font-weight: bold; min-width: 30px; text-align: center; font-size: 1.1rem; color: #333;">${item.quantity}</span>
+                                <button class="quantity-btn" onclick="updateQuantity(${index}, 1)" style="background: #8b7355; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">+</button>
                             </div>
                         </div>
-                        <button class="remove-item" onclick="removeItem(${index})">Remove</button>
+                        <button class="remove-item" onclick="removeItem(${index})" style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Remove</button>
                     </div>
                 `;
+                
+                console.log('Added quantity buttons for item:', item.name);
             });
             
             // Add payment options after cart items
