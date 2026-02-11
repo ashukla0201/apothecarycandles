@@ -126,6 +126,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup lightbox functionality
     setupLightbox();
+    
+    // Setup international telephone input
+    setupPhoneInput();
 });
 
 // Setup lightbox functionality
@@ -184,6 +187,32 @@ function setupLightbox() {
     });
     
     console.log('Lightbox setup complete');
+}
+
+// Setup international telephone input
+function setupPhoneInput() {
+    console.log('Setting up international telephone input...');
+    
+    const phoneInput = document.getElementById('customer-phone');
+    if (!phoneInput) {
+        console.log('Phone input not found');
+        return;
+    }
+    
+    // Initialize intlTelInput
+    const iti = window.intlTelInput(phoneInput, {
+        initialCountry: "in", // Default to India
+        separateDialCode: true,
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        preferredCountries: ["in", "us", "uk", "ca", "au"],
+        placeholderNumberType: "MOBILE",
+        autoPlaceholder: "aggressive"
+    });
+    
+    console.log('International telephone input setup complete');
+    
+    // Store the iti instance globally for validation
+    window.phoneInputInstance = iti;
 }
 
 // Update add to cart button states
@@ -519,9 +548,22 @@ function payViaRazorpay() {
 function validateCustomerDetails() {
     const customerName = document.getElementById('customer-name').value.trim();
     const customerEmail = document.getElementById('customer-email').value.trim();
-    const customerPhone = document.getElementById('customer-phone').value.trim();
     const customerPincode = document.getElementById('customer-pincode').value.trim();
     const customerAddress = document.getElementById('customer-address').value.trim();
+    
+    // Get phone number with country code
+    const phoneInput = document.getElementById('customer-phone');
+    let customerPhone = '';
+    let selectedCountry = '';
+    
+    if (window.phoneInputInstance) {
+        customerPhone = window.phoneInputInstance.getNumber();
+        selectedCountry = window.phoneInputInstance.getSelectedCountryData().name;
+        console.log('Phone with country code:', customerPhone);
+        console.log('Selected country:', selectedCountry);
+    } else {
+        customerPhone = phoneInput.value.trim();
+    }
     
     console.log('Validating customer details:', { customerName, customerEmail, customerPhone, customerPincode, customerAddress });
     
@@ -540,10 +582,9 @@ function validateCustomerDetails() {
         return false;
     }
     
-    // Validate phone (exactly 10 digits)
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!customerPhone || !phoneRegex.test(customerPhone)) {
-        showNotification('Please enter a valid 10-digit mobile number');
+    // Validate phone number with international format
+    if (!customerPhone || customerPhone.length < 7) {
+        showNotification('Please enter a valid phone number with country code');
         document.getElementById('customer-phone').focus();
         return false;
     }
@@ -567,6 +608,7 @@ function validateCustomerDetails() {
         customerName,
         customerEmail,
         customerPhone,
+        selectedCountry,
         customerPincode,
         customerAddress
     };
@@ -590,6 +632,7 @@ function processWhatsAppPayment() {
     orderMessage += `• Name: ${customerDetails.customerName}%0A`;
     orderMessage += `• Email: ${customerDetails.customerEmail}%0A`;
     orderMessage += `• Phone: ${customerDetails.customerPhone}%0A`;
+    orderMessage += `• Country: ${customerDetails.selectedCountry || 'Not specified'}%0A`;
     orderMessage += `• Pincode: ${customerDetails.customerPincode}%0A`;
     orderMessage += `• Address: ${customerDetails.customerAddress}%0A%0A`;
     orderMessage += `*Order Items:*%0A`;
@@ -646,6 +689,7 @@ function processRazorpayPayment() {
             confirmationMessage += `• Name: ${customerDetails.customerName}%0A`;
             confirmationMessage += `• Email: ${customerDetails.customerEmail}%0A`;
             confirmationMessage += `• Phone: ${customerDetails.customerPhone}%0A`;
+            confirmationMessage += `• Country: ${customerDetails.selectedCountry || 'Not specified'}%0A`;
             confirmationMessage += `• Pincode: ${customerDetails.customerPincode}%0A`;
             confirmationMessage += `• Address: ${customerDetails.customerAddress}%0A%0A`;
             confirmationMessage += `*Payment Details:*%0A`;
@@ -674,6 +718,7 @@ function processRazorpayPayment() {
             customer_name: customerDetails.customerName,
             customer_email: customerDetails.customerEmail,
             customer_phone: customerDetails.customerPhone,
+            customer_country: customerDetails.selectedCountry || 'Not specified',
             customer_pincode: customerDetails.customerPincode,
             customer_address: customerDetails.customerAddress,
             items: orderItems
