@@ -143,7 +143,9 @@ function updateCartDisplay() {
                             <div class="cart-item-name">${item.name}</div>
                             <div class="cart-item-price">₹${item.price}</div>
                             <div class="cart-item-quantity">
-                                <span>Quantity: ${item.quantity}</span>
+                                <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
+                                <span class="quantity-value">${item.quantity}</span>
+                                <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
                             </div>
                         </div>
                         <button class="remove-item" onclick="removeItem(${index})">Remove</button>
@@ -176,6 +178,26 @@ function updateCartDisplay() {
     }
 }
 
+// Update quantity
+function updateQuantity(index, change) {
+    console.log('Updating quantity for index:', index, 'change:', change);
+    
+    if (cart[index]) {
+        cart[index].quantity += change;
+        
+        if (cart[index].quantity <= 0) {
+            // Remove item if quantity is 0 or less
+            removeItem(index);
+        } else {
+            // Save and update display
+            localStorage.setItem('apothecaryCart', JSON.stringify(cart));
+            updateCartCounter();
+            updateCartDisplay();
+            showNotification(`Quantity updated to ${cart[index].quantity}`);
+        }
+    }
+}
+
 // Remove item from cart
 function removeItem(index) {
     const itemName = cart[index].name;
@@ -188,6 +210,9 @@ function removeItem(index) {
 
 // Show notification
 function showNotification(message) {
+    console.log('Showing notification:', message);
+    
+    // Create notification element
     const notification = document.createElement('div');
     notification.style.cssText = `
         position: fixed;
@@ -198,11 +223,13 @@ function showNotification(message) {
         padding: 1rem 1.5rem;
         border-radius: 5px;
         z-index: 10000;
+        animation: slideIn 0.3s ease;
         box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     `;
     notification.textContent = message;
     document.body.appendChild(notification);
     
+    // Remove after 3 seconds
     setTimeout(() => {
         if (notification.parentNode) {
             notification.remove();
@@ -213,6 +240,7 @@ function showNotification(message) {
 // Make functions globally accessible
 window.removeItem = removeItem;
 window.updateCartDisplay = updateCartDisplay;
+window.updateQuantity = updateQuantity;
 window.payViaWhatsApp = payViaWhatsApp;
 window.payViaRazorpay = payViaRazorpay;
 
@@ -223,174 +251,22 @@ function payViaWhatsApp() {
         return;
     }
     
-    // Create order message
-    let orderMessage = `🕯️ *New Order - Apothecary Candles*%0A%0A`;
-    orderMessage += `*Order Items:*%0A`;
+    // Get customer details
+    const customerName = prompt('Please enter your name:');
+    if (!customerName) return;
     
-    let total = 0;
-    cart.forEach(item => {
-        const itemTotal = item.price * item.quantity;
-        total += itemTotal;
-        orderMessage += `${item.name} x ${item.quantity} = ₹${itemTotal}%0A`;
-    });
+    const customerPhone = prompt('Please enter your phone number:');
+    if (!customerPhone) return;
     
-    orderMessage += `%0A*Total: ₹${total}*%0A%0A`;
-    orderMessage += `Please confirm the order and payment details.%0A%0A`;
-    orderMessage += `*Customer Information Needed:*%0A`;
-    orderMessage += `• Name%0A`;
-    orderMessage += `• Phone Number%0A`;
-    orderMessage += `• Delivery Address`;
-    
-    const whatsappUrl = `https://wa.me/919956394794?text=${orderMessage}`;
-    window.open(whatsappUrl, '_blank');
-}
-
-function payViaRazorpay() {
-    if (cart.length === 0) {
-        showNotification('Your cart is empty!');
-        return;
-    }
-    
-    // Calculate total amount in paise
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const amountInPaise = total * 100;
-    
-    // Create order description
-    const orderItems = cart.map(item => `${item.name} x ${item.quantity}`).join(', ');
-    
-    const options = {
-        key: 'rzp_test_SEtS6ZUfqY5eIv',
-        amount: amountInPaise,
-        currency: 'INR',
-        name: 'Apothecary Candles',
-        description: orderItems,
-        image: 'https://ashukla0201.github.io/apothecarycandles/logo.jpeg',
-        handler: function (response) {
-            // Payment successful
-            showNotification(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
-            
-            // Send order confirmation via WhatsApp
-            let confirmationMessage = `✅ *Payment Confirmed*%0A%0A`;
-            confirmationMessage += `Payment ID: ${response.razorpay_payment_id}%0A`;
-            confirmationMessage += `Amount: ₹${total}%0A`;
-            confirmationMessage += `Items: ${orderItems}%0A%0A`;
-            confirmationMessage += `*Customer Information Needed:*%0A`;
-            confirmationMessage += `• Name%0A`;
-            confirmationMessage += `• Phone Number%0A`;
-            confirmationMessage += `• Delivery Address`;
-            
-            const whatsappUrl = `https://wa.me/919956394794?text=${confirmationMessage}`;
-            window.open(whatsappUrl, '_blank');
-            
-            // Clear cart after successful payment
-            setTimeout(() => {
-                cart = [];
-                localStorage.setItem('apothecaryCart', JSON.stringify(cart));
-                updateCartCounter();
-                updateCartDisplay();
-            }, 2000);
-        },
-        prefill: {
-            name: '',
-            email: '',
-            contact: ''
-        },
-        notes: {
-            items: orderItems
-        },
-        theme: {
-            color: '#8b7355'
-        },
-        modal: {
-            backdropclose: false,
-            escape: false,
-            handleback: true
-        },
-        config: {
-            display: {
-                blocks: {
-                    banks: {
-                        name: 'Pay via UPI',
-                        instruments: [
-                            {
-                                method: 'upi'
-                            }
-                        ]
-                    }
-                },
-                sequence: ['block.banks'],
-                preferences: {
-                    show_default_blocks: true
-                }
-            }
-        }
-    };
-    
-    const rzp = new Razorpay(options);
-    rzp.open();
-}
-
-// Checkout functionality
-function proceedToCheckout() {
-    if (cart.length === 0) {
-        showNotification('Your cart is empty!');
-        return;
-    }
-    
-    // Hide cart section, show checkout section
-    document.getElementById('cart').style.display = 'none';
-    document.getElementById('checkout').style.display = 'block';
-    
-    // Update checkout items
-    updateCheckoutUI();
-    
-    // Scroll to checkout
-    document.getElementById('checkout').scrollIntoView({ behavior: 'smooth' });
-}
-
-// Update checkout UI
-function updateCheckoutUI() {
-    const checkoutItems = document.getElementById('checkout-items');
-    const checkoutTotal = document.getElementById('checkout-total');
-    
-    let checkoutHTML = '';
-    let total = 0;
-    
-    cart.forEach(item => {
-        const itemTotal = item.price * item.quantity;
-        total += itemTotal;
-        
-        checkoutHTML += `
-            <div class="checkout-item">
-                <span>${item.name} x ${item.quantity}</span>
-                <span>₹${itemTotal}</span>
-            </div>
-        `;
-    });
-    
-    checkoutItems.innerHTML = checkoutHTML;
-    checkoutTotal.textContent = total;
-}
-
-// Payment functions
-function payViaWhatsApp() {
-    const name = document.getElementById('customer-name').value;
-    const email = document.getElementById('customer-email').value;
-    const phone = document.getElementById('customer-phone').value;
-    const address = document.getElementById('customer-address').value;
-    
-    if (!name || !email || !phone || !address) {
-        showNotification('Please fill all customer details');
-        return;
-    }
+    const customerAddress = prompt('Please enter your delivery address:');
+    if (!customerAddress) return;
     
     // Create order message
     let orderMessage = `🕯️ *New Order - Apothecary Candles*%0A%0A`;
     orderMessage += `*Customer Details:*%0A`;
-    orderMessage += `Name: ${name}%0A`;
-    orderMessage += `Email: ${email}%0A`;
-    orderMessage += `Phone: ${phone}%0A`;
-    orderMessage += `Address: ${address}%0A%0A`;
+    orderMessage += `• Name: ${customerName}%0A`;
+    orderMessage += `• Phone: ${customerPhone}%0A`;
+    orderMessage += `• Address: ${customerAddress}%0A%0A`;
     orderMessage += `*Order Items:*%0A`;
     
     let total = 0;
@@ -405,26 +281,23 @@ function payViaWhatsApp() {
     
     const whatsappUrl = `https://wa.me/919956394794?text=${orderMessage}`;
     window.open(whatsappUrl, '_blank');
-    
-    // Clear cart after successful order
-    setTimeout(() => {
-        clearCart();
-        document.getElementById('checkout').style.display = 'none';
-        document.getElementById('cart').style.display = 'block';
-        document.getElementById('checkout-form').reset();
-    }, 2000);
 }
 
 function payViaRazorpay() {
-    const name = document.getElementById('customer-name').value;
-    const email = document.getElementById('customer-email').value;
-    const phone = document.getElementById('customer-phone').value;
-    const address = document.getElementById('customer-address').value;
-    
-    if (!name || !email || !phone || !address) {
-        showNotification('Please fill all customer details');
+    if (cart.length === 0) {
+        showNotification('Your cart is empty!');
         return;
     }
+    
+    // Get customer details
+    const customerName = prompt('Please enter your name:');
+    if (!customerName) return;
+    
+    const customerPhone = prompt('Please enter your phone number:');
+    if (!customerPhone) return;
+    
+    const customerAddress = prompt('Please enter your delivery address:');
+    if (!customerAddress) return;
     
     // Calculate total amount in paise
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -446,31 +319,35 @@ function payViaRazorpay() {
             
             // Send order confirmation via WhatsApp
             let confirmationMessage = `✅ *Payment Confirmed*%0A%0A`;
+            confirmationMessage += `*Customer Details:*%0A`;
+            confirmationMessage += `• Name: ${customerName}%0A`;
+            confirmationMessage += `• Phone: ${customerPhone}%0A`;
+            confirmationMessage += `• Address: ${customerAddress}%0A%0A`;
+            confirmationMessage += `*Payment Details:*%0A`;
             confirmationMessage += `Payment ID: ${response.razorpay_payment_id}%0A`;
-            confirmationMessage += `Customer: ${name}%0A`;
-            confirmationMessage += `Phone: ${phone}%0A`;
             confirmationMessage += `Amount: ₹${total}%0A`;
-            confirmationMessage += `Items: ${orderItems}%0A`;
-            confirmationMessage += `Address: ${address}`;
+            confirmationMessage += `Items: ${orderItems}%0A%0A`;
+            confirmationMessage += `Please process the order for delivery.`;
             
             const whatsappUrl = `https://wa.me/919956394794?text=${confirmationMessage}`;
             window.open(whatsappUrl, '_blank');
             
             // Clear cart after successful payment
             setTimeout(() => {
-                clearCart();
-                document.getElementById('checkout').style.display = 'none';
-                document.getElementById('cart').style.display = 'block';
-                document.getElementById('checkout-form').reset();
+                cart = [];
+                localStorage.setItem('apothecaryCart', JSON.stringify(cart));
+                updateCartCounter();
+                updateCartDisplay();
             }, 2000);
         },
         prefill: {
-            name: name,
-            email: email,
-            contact: phone
+            name: customerName,
+            contact: customerPhone
         },
         notes: {
-            address: address,
+            customer_name: customerName,
+            customer_phone: customerPhone,
+            customer_address: customerAddress,
             items: orderItems
         },
         theme: {
@@ -504,156 +381,3 @@ function payViaRazorpay() {
     const rzp = new Razorpay(options);
     rzp.open();
 }
-
-// Event Listeners
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded - Initializing Cart System');
-    
-    // Initialize cart
-    initCart();
-    
-    // Add to cart buttons
-    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
-    console.log('Found Add to Cart buttons:', addToCartButtons.length);
-    
-    addToCartButtons.forEach((button, index) => {
-        console.log(`Button ${index}:`, button.dataset.name, button.dataset.price);
-        
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Add to Cart button clicked');
-            
-            const name = this.dataset.name;
-            const price = parseInt(this.dataset.price);
-            const image = this.dataset.image;
-            
-            console.log('Adding to cart:', { name, price, image });
-            addToCart(name, price, image);
-        });
-    });
-    
-    // Cart action buttons
-    const clearCartBtn = document.getElementById('clear-cart');
-    const checkoutBtn = document.getElementById('checkout-btn');
-    
-    if (clearCartBtn) {
-        clearCartBtn.addEventListener('click', clearCart);
-    }
-    
-    if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', proceedToCheckout);
-    }
-    
-    // Checkout payment buttons
-    const payWhatsAppBtn = document.getElementById('pay-whatsapp');
-    const payRazorpayBtn = document.getElementById('pay-razorpay');
-    
-    if (payWhatsAppBtn) {
-        payWhatsAppBtn.addEventListener('click', payViaWhatsApp);
-    }
-    
-    if (payRazorpayBtn) {
-        payRazorpayBtn.addEventListener('click', payViaRazorpay);
-    }
-    
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-    
-    // Product card animations on scroll
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-    
-    const productCards = document.querySelectorAll('.product-card');
-    productCards.forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(card);
-    });
-    
-    // Lightbox functionality
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
-    const lightboxCaption = document.querySelector('.lightbox-caption');
-    const lightboxClose = document.querySelector('.lightbox-close');
-    
-    const productImages = document.querySelectorAll('.product-image');
-    productImages.forEach(img => {
-        img.addEventListener('click', function() {
-            const imgSrc = this.src;
-            const imgAlt = this.alt;
-            
-            lightboxImg.src = imgSrc;
-            lightboxCaption.textContent = imgAlt;
-            lightbox.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        });
-    });
-    
-    lightboxClose.addEventListener('click', function() {
-        lightbox.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    });
-    
-    lightbox.addEventListener('click', function(e) {
-        if (e.target === lightbox) {
-            lightbox.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-    });
-    
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && lightbox.style.display === 'block') {
-            lightbox.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-    });
-    
-    // Add scroll effect to header
-    window.addEventListener('scroll', function() {
-        const header = document.querySelector('header');
-        if (window.scrollY > 100) {
-            header.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
-        } else {
-            header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-        }
-    });
-});
-
-// Add notification styles
-const notificationStyles = document.createElement('style');
-notificationStyles.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-`;
-document.head.appendChild(notificationStyles);
