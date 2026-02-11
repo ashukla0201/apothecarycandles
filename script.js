@@ -142,19 +142,22 @@ function setupLightbox() {
         return;
     }
     
-    // Add click event to all product images
-    const productImages = document.querySelectorAll('.product-image img');
-    productImages.forEach(img => {
+    // Add click event to all product images (direct img tags with class product-image)
+    const productImages = document.querySelectorAll('img.product-image');
+    console.log('Found product images:', productImages.length);
+    
+    productImages.forEach((img, index) => {
+        console.log(`Setting up lightbox for image ${index}:`, img.src);
         img.style.cursor = 'pointer';
         img.onclick = function() {
             console.log('Opening lightbox for image:', this.src);
             lightbox.style.display = 'block';
             lightboxImg.src = this.src;
             
-            // Get caption from product name
-            const productCard = this.closest('.product-card');
-            const productName = productCard ? productCard.querySelector('h3').textContent : '';
+            // Get caption from product name (next h3 element)
+            const productName = this.nextElementSibling ? this.nextElementSibling.textContent : '';
             lightboxCaption.textContent = productName;
+            console.log('Product caption:', productName);
         };
     });
     
