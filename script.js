@@ -1,168 +1,67 @@
-// Shopping Cart Functionality
+// Simple Cart System
 let cart = [];
 
-// Initialize cart from localStorage
-function initCart() {
+// Initialize cart when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Page loaded - setting up cart');
+    
+    // Load cart from localStorage
     const savedCart = localStorage.getItem('apothecaryCart');
     if (savedCart) {
         cart = JSON.parse(savedCart);
-        updateCartUI();
-    }
-}
-
-// Save cart to localStorage
-function saveCart() {
-    localStorage.setItem('apothecaryCart', JSON.stringify(cart));
-    updateCartUI();
-}
-
-// Update cart UI
-function updateCartUI() {
-    const cartCount = document.getElementById('cart-count');
-    const cartItems = document.getElementById('cart-items');
-    const cartTotal = document.getElementById('cart-total');
-    
-    // Update cart count
-    if (cartCount) {
-        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        cartCount.textContent = totalItems;
-        console.log('Updated cart count to:', totalItems);
+        console.log('Loaded cart from storage:', cart);
     }
     
-    // Update cart items
-    if (cartItems && cartTotal) {
-        if (cart.length === 0) {
-            cartItems.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
-            cartTotal.textContent = '0';
-        } else {
-            let cartHTML = '';
-            let total = 0;
+    // Setup all Add to Cart buttons
+    const buttons = document.querySelectorAll('.add-to-cart-btn');
+    console.log('Found buttons:', buttons.length);
+    
+    buttons.forEach((button, index) => {
+        console.log(`Setting up button ${index}:`, button.dataset.name);
+        
+        button.onclick = function(e) {
+            e.preventDefault();
+            console.log('Button clicked!');
             
-            cart.forEach((item, index) => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                
-                cartHTML += `
-                    <div class="cart-item">
-                        <img src="${item.image}" alt="${item.name}">
-                        <div class="cart-item-details">
-                            <div class="cart-item-name">${item.name}</div>
-                            <div class="cart-item-price">₹${item.price}</div>
-                            <div class="cart-item-quantity">
-                                <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
-                                <span>${item.quantity}</span>
-                                <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
-                            </div>
-                        </div>
-                        <button class="remove-item" onclick="removeFromCart(${index})">Remove</button>
-                    </div>
-                `;
+            const name = this.dataset.name;
+            const price = parseInt(this.dataset.price);
+            const image = this.dataset.image;
+            
+            console.log('Adding item:', { name, price, image });
+            
+            // Add to cart
+            cart.push({
+                name: name,
+                price: price,
+                image: image,
+                quantity: 1
             });
             
-            cartItems.innerHTML = cartHTML;
-            cartTotal.textContent = total;
-            console.log('Updated cart display with total:', total);
-        }
-    }
-}
-
-// Add to cart
-function addToCart(name, price, image) {
-    console.log('addToCart function called with:', { name, price, image });
-    
-    const existingItem = cart.find(item => item.name === name);
-    
-    if (existingItem) {
-        existingItem.quantity += 1;
-        console.log('Updated existing item quantity:', existingItem);
-    } else {
-        const newItem = {
-            name: name,
-            price: price,
-            image: image,
-            quantity: 1
+            // Save to localStorage
+            localStorage.setItem('apothecaryCart', JSON.stringify(cart));
+            
+            // Update cart counter
+            const cartCount = document.getElementById('cart-count');
+            if (cartCount) {
+                cartCount.textContent = cart.length;
+                console.log('Updated cart count to:', cart.length);
+            }
+            
+            // Show simple alert
+            alert(`${name} added to cart! Total items: ${cart.length}`);
+            
+            console.log('Cart now:', cart);
         };
-        cart.push(newItem);
-        console.log('Added new item to cart:', newItem);
+    });
+});
+
+// Make functions available globally
+window.updateCartCount = function() {
+    const cartCount = document.getElementById('cart-count');
+    if (cartCount) {
+        cartCount.textContent = cart.length;
     }
-    
-    console.log('Cart after adding:', cart);
-    saveCart();
-    
-    // Show success message
-    showNotification(`${name} added to cart!`);
-}
-
-// Update quantity
-function updateQuantity(index, change) {
-    cart[index].quantity += change;
-    
-    if (cart[index].quantity <= 0) {
-        removeFromCart(index);
-    } else {
-        saveCart();
-    }
-}
-
-// Remove from cart
-function removeFromCart(index) {
-    const itemName = cart[index].name;
-    cart.splice(index, 1);
-    saveCart();
-    showNotification(`${itemName} removed from cart`);
-}
-
-// Clear cart
-function clearCart() {
-    cart = [];
-    saveCart();
-    showNotification('Cart cleared');
-}
-
-// Show notification
-function showNotification(message) {
-    console.log('Showing notification:', message);
-    
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #28a745;
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 5px;
-        z-index: 10000;
-        animation: slideIn 0.3s ease;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Remove after 3 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
-        }
-    }, 3000);
-}
-
-// Test function - call this to test if cart works
-function testCart() {
-    console.log('Testing cart functionality...');
-    addToCart('Test Candle', 100, 'candle1.jpg');
-}
-
-// Make functions globally accessible
-window.addToCart = addToCart;
-window.updateQuantity = updateQuantity;
-window.removeFromCart = removeFromCart;
-window.clearCart = clearCart;
-window.showNotification = showNotification;
-window.testCart = testCart;
+};
 
 // Checkout functionality
 function proceedToCheckout() {
