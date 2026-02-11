@@ -479,6 +479,38 @@ footer p {
 .product-image:hover {
     transform: scale(1.05);
 }
+
+.payment-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.whatsapp-order {
+    background: #25D366;
+    color: white;
+}
+
+.whatsapp-order:hover {
+    background: #128C7E;
+    transform: translateY(-2px);
+}
+
+.razorpay-payment {
+    background: #3395ff;
+    color: white;
+}
+
+.razorpay-payment:hover {
+    background: #1976d2;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .payment-buttons {
+        gap: 0.75rem;
+    }
+}
 @media (max-width: 768px) {
     .nav-links {
         display: none;

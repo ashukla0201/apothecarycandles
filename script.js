@@ -71,7 +71,7 @@ function toggleMobileMenu() {
 }
 
 // WhatsApp order functionality
-document.querySelectorAll('.buy-button').forEach(button => {
+document.querySelectorAll('.whatsapp-order').forEach(button => {
     button.addEventListener('click', function() {
         const productCard = this.closest('.product-card');
         const productName = productCard.querySelector('h3').textContent;
@@ -81,6 +81,50 @@ document.querySelectorAll('.buy-button').forEach(button => {
         const whatsappUrl = `https://wa.me/919956394794?text=${encodeURIComponent(message)}`;
         
         window.open(whatsappUrl, '_blank');
+    });
+});
+
+// Razorpay payment functionality
+document.querySelectorAll('.razorpay-payment').forEach(button => {
+    button.addEventListener('click', function() {
+        const productCard = this.closest('.product-card');
+        const productName = productCard.dataset.productName;
+        const productDescription = productCard.dataset.productDescription;
+        const amount = productCard.dataset.amount;
+        const currency = productCard.dataset.currency;
+        
+        const options = {
+            key: 'rzp_test_YourKeyHere', // Replace with your Razorpay key
+            amount: amount,
+            currency: currency,
+            name: 'Apothecary Candles',
+            description: `${productName} - ${productDescription}`,
+            image: 'https://your-website-url/logo.jpeg', // Replace with your logo URL
+            handler: function (response) {
+                // Payment successful
+                alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+                
+                // Send order confirmation via WhatsApp
+                const message = `Hi! I've placed an order for: ${productName} - ${productCard.querySelector('.price').textContent}. Payment ID: ${response.razorpay_payment_id}`;
+                const whatsappUrl = `https://wa.me/919956394794?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            },
+            prefill: {
+                name: '',
+                email: '',
+                contact: ''
+            },
+            notes: {
+                product: productName,
+                description: productDescription
+            },
+            theme: {
+                color: '#8b7355'
+            }
+        };
+        
+        const rzp = new Razorpay(options);
+        rzp.open();
     });
 });
 
