@@ -94,12 +94,12 @@ document.querySelectorAll('.razorpay-payment').forEach(button => {
         const currency = productCard.dataset.currency;
         
         const options = {
-            key: 'rzp_test_YourKeyHere', // Replace with your Razorpay key
+            key: 'rzp_test_1DP5mmOlF5G5ag', // Razorpay test key
             amount: amount,
             currency: currency,
             name: 'Apothecary Candles',
             description: `${productName} - ${productDescription}`,
-            image: 'https://your-website-url/logo.jpeg', // Replace with your logo URL
+            image: 'https://ashukla0201.github.io/apothecarycandles/logo.jpeg',
             handler: function (response) {
                 // Payment successful
                 alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
