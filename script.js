@@ -69,3 +69,62 @@ function toggleMobileMenu() {
     const navLinks = document.querySelector('.nav-links');
     navLinks.classList.toggle('active');
 }
+
+// WhatsApp order functionality
+document.querySelectorAll('.buy-button').forEach(button => {
+    button.addEventListener('click', function() {
+        const productCard = this.closest('.product-card');
+        const productName = productCard.querySelector('h3').textContent;
+        const productPrice = productCard.querySelector('.price').textContent;
+        
+        const message = `Hi! I'd like to order: ${productName} - ${productPrice}`;
+        const whatsappUrl = `https://wa.me/919956394794?text=${encodeURIComponent(message)}`;
+        
+        window.open(whatsappUrl, '_blank');
+    });
+});
+
+// Lightbox functionality
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+const lightboxCaption = document.querySelector('.lightbox-caption');
+const lightboxClose = document.querySelector('.lightbox-close');
+
+// Add click event to all product images
+document.addEventListener('DOMContentLoaded', function() {
+    const productImages = document.querySelectorAll('.product-image');
+    
+    productImages.forEach(img => {
+        img.addEventListener('click', function() {
+            const imgSrc = this.src;
+            const imgAlt = this.alt;
+            
+            lightboxImg.src = imgSrc;
+            lightboxCaption.textContent = imgAlt;
+            lightbox.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        });
+    });
+});
+
+// Close lightbox when clicking on close button
+lightboxClose.addEventListener('click', function() {
+    lightbox.style.display = 'none';
+    document.body.style.overflow = 'auto'; // Enable scrolling
+});
+
+// Close lightbox when clicking on the background
+lightbox.addEventListener('click', function(e) {
+    if (e.target === lightbox) {
+        lightbox.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Enable scrolling
+    }
+});
+
+// Close lightbox with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && lightbox.style.display === 'block') {
+        lightbox.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Enable scrolling
+    }
+});
