@@ -384,6 +384,7 @@ window.updateQuantity = updateQuantity;
 window.setQuantity = setQuantity;
 window.proceedToCheckout = proceedToCheckout;
 window.backToCart = backToCart;
+window.validateCustomerDetails = validateCustomerDetails;
 window.payViaWhatsApp = payViaWhatsApp;
 window.payViaRazorpay = payViaRazorpay;
 window.processWhatsAppPayment = processWhatsAppPayment;
@@ -428,31 +429,83 @@ function payViaRazorpay() {
     }
 }
 
+// Validate customer details
+function validateCustomerDetails() {
+    const customerName = document.getElementById('customer-name').value.trim();
+    const customerEmail = document.getElementById('customer-email').value.trim();
+    const customerPhone = document.getElementById('customer-phone').value.trim();
+    const customerPincode = document.getElementById('customer-pincode').value.trim();
+    const customerAddress = document.getElementById('customer-address').value.trim();
+    
+    console.log('Validating customer details:', { customerName, customerEmail, customerPhone, customerPincode, customerAddress });
+    
+    // Validate name (minimum 3 characters)
+    if (!customerName || customerName.length < 3) {
+        showNotification('Please enter a valid name (minimum 3 characters)');
+        document.getElementById('customer-name').focus();
+        return false;
+    }
+    
+    // Validate email (must contain @ and .)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!customerEmail || !emailRegex.test(customerEmail)) {
+        showNotification('Please enter a valid email address (must contain @ and .)');
+        document.getElementById('customer-email').focus();
+        return false;
+    }
+    
+    // Validate phone (exactly 10 digits)
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!customerPhone || !phoneRegex.test(customerPhone)) {
+        showNotification('Please enter a valid 10-digit mobile number');
+        document.getElementById('customer-phone').focus();
+        return false;
+    }
+    
+    // Validate pincode (exactly 6 digits)
+    const pincodeRegex = /^[0-9]{6}$/;
+    if (!customerPincode || !pincodeRegex.test(customerPincode)) {
+        showNotification('Please enter a valid 6-digit pincode');
+        document.getElementById('customer-pincode').focus();
+        return false;
+    }
+    
+    // Validate address (minimum 10 characters)
+    if (!customerAddress || customerAddress.length < 10) {
+        showNotification('Please enter a complete delivery address (minimum 10 characters)');
+        document.getElementById('customer-address').focus();
+        return false;
+    }
+    
+    return {
+        customerName,
+        customerEmail,
+        customerPhone,
+        customerPincode,
+        customerAddress
+    };
+}
+
 // Process WhatsApp payment after form is filled
 function processWhatsAppPayment() {
     console.log('Processing WhatsApp payment...');
     
-    // Get customer details from checkout form
-    const customerName = document.getElementById('customer-name').value;
-    const customerEmail = document.getElementById('customer-email').value;
-    const customerPhone = document.getElementById('customer-phone').value;
-    const customerAddress = document.getElementById('customer-address').value;
-    
-    console.log('Customer details:', { customerName, customerEmail, customerPhone, customerAddress });
-    
-    if (!customerName || !customerEmail || !customerPhone || !customerAddress) {
-        showNotification('Please fill in all customer details!');
-        return;
+    // Validate customer details
+    const customerDetails = validateCustomerDetails();
+    if (!customerDetails) {
+        return; // Validation failed, error message already shown
     }
     
-    console.log('Creating WhatsApp message...');
+    console.log('Customer details validated:', customerDetails);
+    
     // Create order message
     let orderMessage = `🕯️ *New Order - Apothecary Candles*%0A%0A`;
     orderMessage += `*Customer Details:*%0A`;
-    orderMessage += `• Name: ${customerName}%0A`;
-    orderMessage += `• Email: ${customerEmail}%0A`;
-    orderMessage += `• Phone: ${customerPhone}%0A`;
-    orderMessage += `• Address: ${customerAddress}%0A%0A`;
+    orderMessage += `• Name: ${customerDetails.customerName}%0A`;
+    orderMessage += `• Email: ${customerDetails.customerEmail}%0A`;
+    orderMessage += `• Phone: ${customerDetails.customerPhone}%0A`;
+    orderMessage += `• Pincode: ${customerDetails.customerPincode}%0A`;
+    orderMessage += `• Address: ${customerDetails.customerAddress}%0A%0A`;
     orderMessage += `*Order Items:*%0A`;
     
     let total = 0;
@@ -474,20 +527,14 @@ function processWhatsAppPayment() {
 function processRazorpayPayment() {
     console.log('Processing Razorpay payment...');
     
-    // Get customer details from checkout form
-    const customerName = document.getElementById('customer-name').value;
-    const customerEmail = document.getElementById('customer-email').value;
-    const customerPhone = document.getElementById('customer-phone').value;
-    const customerAddress = document.getElementById('customer-address').value;
-    
-    console.log('Customer details:', { customerName, customerEmail, customerPhone, customerAddress });
-    
-    if (!customerName || !customerEmail || !customerPhone || !customerAddress) {
-        showNotification('Please fill in all customer details!');
-        return;
+    // Validate customer details
+    const customerDetails = validateCustomerDetails();
+    if (!customerDetails) {
+        return; // Validation failed, error message already shown
     }
     
-    console.log('Initializing Razorpay payment...');
+    console.log('Customer details validated:', customerDetails);
+    
     // Calculate total amount in paise
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const amountInPaise = total * 100;
@@ -510,10 +557,11 @@ function processRazorpayPayment() {
             // Send order confirmation via WhatsApp
             let confirmationMessage = `✅ *Payment Confirmed*%0A%0A`;
             confirmationMessage += `*Customer Details:*%0A`;
-            confirmationMessage += `• Name: ${customerName}%0A`;
-            confirmationMessage += `• Email: ${customerEmail}%0A`;
-            confirmationMessage += `• Phone: ${customerPhone}%0A`;
-            confirmationMessage += `• Address: ${customerAddress}%0A%0A`;
+            confirmationMessage += `• Name: ${customerDetails.customerName}%0A`;
+            confirmationMessage += `• Email: ${customerDetails.customerEmail}%0A`;
+            confirmationMessage += `• Phone: ${customerDetails.customerPhone}%0A`;
+            confirmationMessage += `• Pincode: ${customerDetails.customerPincode}%0A`;
+            confirmationMessage += `• Address: ${customerDetails.customerAddress}%0A%0A`;
             confirmationMessage += `*Payment Details:*%0A`;
             confirmationMessage += `Payment ID: ${response.razorpay_payment_id}%0A`;
             confirmationMessage += `Amount: ₹${total}%0A`;
@@ -532,15 +580,16 @@ function processRazorpayPayment() {
             }, 2000);
         },
         prefill: {
-            name: customerName,
-            email: customerEmail,
-            contact: customerPhone
+            name: customerDetails.customerName,
+            email: customerDetails.customerEmail,
+            contact: customerDetails.customerPhone
         },
         notes: {
-            customer_name: customerName,
-            customer_email: customerEmail,
-            customer_phone: customerPhone,
-            customer_address: customerAddress,
+            customer_name: customerDetails.customerName,
+            customer_email: customerDetails.customerEmail,
+            customer_phone: customerDetails.customerPhone,
+            customer_pincode: customerDetails.customerPincode,
+            customer_address: customerDetails.customerAddress,
             items: orderItems
         },
         theme: {
