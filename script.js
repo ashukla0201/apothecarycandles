@@ -34,15 +34,26 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Adding item:', { name, price, image });
             console.log('Cart before add:', JSON.parse(JSON.stringify(cart)));
             
-            // Check if item already exists in cart
-            const existingItem = cart.find(item => item.name === name);
-            console.log('Existing item found:', existingItem);
+            // Check if item already exists in cart - use manual loop for reliability
+            let existingItem = null;
+            let existingIndex = -1;
             
-            if (existingItem) {
+            for (let i = 0; i < cart.length; i++) {
+                if (cart[i].name === name) {
+                    existingItem = cart[i];
+                    existingIndex = i;
+                    break;
+                }
+            }
+            
+            console.log('Existing item found:', existingItem);
+            console.log('Existing index:', existingIndex);
+            
+            if (existingItem && existingIndex !== -1) {
                 // Increase quantity if item exists
-                existingItem.quantity += 1;
-                console.log('Updated existing item quantity:', existingItem);
-                showNotification(`${name} quantity increased to ${existingItem.quantity}!`);
+                cart[existingIndex].quantity += 1;
+                console.log('Updated existing item quantity:', cart[existingIndex]);
+                showNotification(`${name} quantity increased to ${cart[existingIndex].quantity}!`);
             } else {
                 // Add new item if doesn't exist
                 cart.push({
