@@ -100,6 +100,22 @@ document.addEventListener('DOMContentLoaded', function() {
             proceedToCheckout();
         };
     }
+    
+    // Setup checkout payment buttons
+    const payWhatsAppBtn = document.getElementById('pay-whatsapp');
+    const payRazorpayBtn = document.getElementById('pay-razorpay');
+    
+    if (payWhatsAppBtn) {
+        payWhatsAppBtn.onclick = function() {
+            processWhatsAppPayment();
+        };
+    }
+    
+    if (payRazorpayBtn) {
+        payRazorpayBtn.onclick = function() {
+            processRazorpayPayment();
+        };
+    }
 });
 
 // Update cart counter
@@ -326,6 +342,8 @@ window.setQuantity = setQuantity;
 window.proceedToCheckout = proceedToCheckout;
 window.payViaWhatsApp = payViaWhatsApp;
 window.payViaRazorpay = payViaRazorpay;
+window.processWhatsAppPayment = processWhatsAppPayment;
+window.processRazorpayPayment = processRazorpayPayment;
 
 // Payment functions
 function payViaWhatsApp() {
@@ -335,7 +353,53 @@ function payViaWhatsApp() {
         return;
     }
     
-    console.log('Getting customer details from checkout form...');
+    // Always redirect to checkout first
+    proceedToCheckout();
+    
+    // Focus on the first empty field
+    setTimeout(() => {
+        const customerName = document.getElementById('customer-name').value;
+        if (!customerName) {
+            document.getElementById('customer-name').focus();
+        } else {
+            const customerEmail = document.getElementById('customer-email').value;
+            if (!customerEmail) {
+                document.getElementById('customer-email').focus();
+            }
+        }
+        showNotification('Please fill in your details to complete the order');
+    }, 500);
+}
+
+function payViaRazorpay() {
+    console.log('payViaRazorpay called');
+    if (cart.length === 0) {
+        showNotification('Your cart is empty!');
+        return;
+    }
+    
+    // Always redirect to checkout first
+    proceedToCheckout();
+    
+    // Focus on the first empty field
+    setTimeout(() => {
+        const customerName = document.getElementById('customer-name').value;
+        if (!customerName) {
+            document.getElementById('customer-name').focus();
+        } else {
+            const customerEmail = document.getElementById('customer-email').value;
+            if (!customerEmail) {
+                document.getElementById('customer-email').focus();
+            }
+        }
+        showNotification('Please fill in your details to proceed with payment');
+    }, 500);
+}
+
+// Process WhatsApp payment after form is filled
+function processWhatsAppPayment() {
+    console.log('Processing WhatsApp payment...');
+    
     // Get customer details from checkout form
     const customerName = document.getElementById('customer-name').value;
     const customerEmail = document.getElementById('customer-email').value;
@@ -374,14 +438,10 @@ function payViaWhatsApp() {
     window.open(whatsappUrl, '_blank');
 }
 
-function payViaRazorpay() {
-    console.log('payViaRazorpay called');
-    if (cart.length === 0) {
-        showNotification('Your cart is empty!');
-        return;
-    }
+// Process Razorpay payment after form is filled
+function processRazorpayPayment() {
+    console.log('Processing Razorpay payment...');
     
-    console.log('Getting customer details from checkout form for Razorpay...');
     // Get customer details from checkout form
     const customerName = document.getElementById('customer-name').value;
     const customerEmail = document.getElementById('customer-email').value;
