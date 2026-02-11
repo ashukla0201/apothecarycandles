@@ -842,9 +842,10 @@ footer p {
 
 /* Add to Cart Button */
 .add-to-cart-btn {
-    background: transparent;
-    color: #666;
-    border: 2px solid #ddd;
+    background: transparent !important;
+    color: #666 !important;
+    border: none !important;
+    outline: none !important;
     padding: 0.75rem 1.5rem;
     border-radius: 25px;
     cursor: pointer;
@@ -853,26 +854,37 @@ footer p {
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    box-shadow: none !important;
 }
 
 .add-to-cart-btn:hover {
-    background: #87ceeb; /* Sky blue */
-    color: white;
-    border-color: #87ceeb;
+    background: #87ceeb !important; /* Sky blue */
+    color: white !important;
     transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(135, 206, 235, 0.4);
+    box-shadow: 0 6px 15px rgba(135, 206, 235, 0.4) !important;
 }
 
 .add-to-cart-btn:active {
     transform: translateY(0);
-    box-shadow: 0 2px 5px rgba(135, 206, 235, 0.3);
+    box-shadow: 0 2px 5px rgba(135, 206, 235, 0.3) !important;
 }
 
 /* Added to cart state */
 .add-to-cart-btn.added {
-    background: #87ceeb; /* Sky blue */
-    color: white;
-    border-color: #87ceeb;
+    background: #87ceeb !important; /* Sky blue */
+    color: white !important;
+}
+
+/* Force override any other styles */
+.product-actions .add-to-cart-btn {
+    background: transparent !important;
+    border: none !important;
+    color: #666 !important;
+}
+
+.product-actions .add-to-cart-btn:hover {
+    background: #87ceeb !important;
+    color: white !important;
 }
 
 /* Quantity Controls */
