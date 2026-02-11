@@ -33,25 +33,34 @@ document.addEventListener('DOMContentLoaded', function() {
             
             console.log('Adding item:', { name, price, image });
             
-            // Add to cart
-            cart.push({
-                name: name,
-                price: price,
-                image: image,
-                quantity: 1
-            });
+            // Check if item already exists in cart
+            const existingItem = cart.find(item => item.name === name);
+            
+            if (existingItem) {
+                // Increase quantity if item exists
+                existingItem.quantity += 1;
+                console.log('Updated existing item quantity:', existingItem);
+                showNotification(`${name} quantity increased to ${existingItem.quantity}!`);
+            } else {
+                // Add new item if doesn't exist
+                cart.push({
+                    name: name,
+                    price: price,
+                    image: image,
+                    quantity: 1
+                });
+                console.log('Added new item to cart');
+                showNotification(`${name} added to cart!`);
+            }
             
             // Save to localStorage
             localStorage.setItem('apothecaryCart', JSON.stringify(cart));
             
-            console.log('Cart after adding:', cart);
+            console.log('Cart after update:', cart);
             
             // Update cart counter and display
             updateCartCounter();
             updateCartDisplay();
-            
-            // Show success message
-            showNotification(`${name} added to cart!`);
         };
     });
     
@@ -84,8 +93,10 @@ document.addEventListener('DOMContentLoaded', function() {
 function updateCartCounter() {
     const cartCount = document.getElementById('cart-count');
     if (cartCount) {
-        cartCount.textContent = cart.length;
-        console.log('Updated cart count to:', cart.length);
+        // Calculate total quantity of all items
+        const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartCount.textContent = totalQuantity;
+        console.log('Updated cart count to:', totalQuantity);
     }
 }
 
