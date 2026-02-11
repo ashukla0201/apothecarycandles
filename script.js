@@ -223,18 +223,26 @@ function setupDemoAutocomplete() {
     
     console.log('Address input found:', addressInput);
     
-    // Sample addresses for demo
+    // Sample addresses for demo - expanded with more variations
     const sampleAddresses = [
         { name: 'Vaishno Silver Bells', address: 'Vaishno Silver Bells, Sector 12, Dwarka, Delhi, 110075', pincode: '110075' },
         { name: 'Vaishno Silver Bells Apartment', address: 'Vaishno Silver Bells Apartment, Plot 12, Dwarka Sector 12, New Delhi, Delhi 110075', pincode: '110075' },
         { name: 'Silver Bells Society', address: 'Silver Bells Society, Phase 1, Gurgaon, Haryana, 122001', pincode: '122001' },
         { name: 'DLF Phase 1', address: 'DLF Phase 1, Gurgaon, Haryana, 122001', pincode: '122001' },
         { name: 'Connaught Place', address: 'Connaught Place, New Delhi, Delhi, 110001', pincode: '110001' },
+        { name: 'CP', address: 'Connaught Place, New Delhi, Delhi, 110001', pincode: '110001' },
         { name: 'Nehru Place', address: 'Nehru Place, New Delhi, Delhi, 110019', pincode: '110019' },
         { name: 'Rajouri Garden', address: 'Rajouri Garden, New Delhi, Delhi, 110027', pincode: '110027' },
         { name: 'Karol Bagh', address: 'Karol Bagh, New Delhi, Delhi, 110005', pincode: '110005' },
         { name: 'Lajpat Nagar', address: 'Lajpat Nagar, New Delhi, Delhi, 110024', pincode: '110024' },
-        { name: 'South Extension', address: 'South Extension, New Delhi, Delhi, 110049', pincode: '110049' }
+        { name: 'South Extension', address: 'South Extension, New Delhi, Delhi, 110049', pincode: '110049' },
+        { name: 'South Ex', address: 'South Extension, New Delhi, Delhi, 110049', pincode: '110049' },
+        { name: 'DLF', address: 'DLF Phase 1, Gurgaon, Haryana, 122001', pincode: '122001' },
+        { name: 'Gurgaon', address: 'DLF Phase 1, Gurgaon, Haryana, 122001', pincode: '122001' },
+        { name: 'Dwarka', address: 'Vaishno Silver Bells, Sector 12, Dwarka, Delhi, 110075', pincode: '110075' },
+        { name: 'Sector 12', address: 'Vaishno Silver Bells, Sector 12, Dwarka, Delhi, 110075', pincode: '110075' },
+        { name: 'New Delhi', address: 'Connaught Place, New Delhi, Delhi, 110001', pincode: '110001' },
+        { name: 'Delhi', address: 'Connaught Place, New Delhi, Delhi, 110001', pincode: '110001' }
     ];
     
     let currentTimeout;
@@ -287,13 +295,24 @@ function setupDemoAutocomplete() {
             loadingIndicator.style.display = 'none';
             console.log('Searching for:', query);
             
-            // Filter addresses
-            const matches = sampleAddresses.filter(addr => 
-                addr.name.toLowerCase().includes(query) || 
-                addr.address.toLowerCase().includes(query)
-            );
+            // Filter addresses with more flexible matching
+            const matches = sampleAddresses.filter(addr => {
+                const nameMatch = addr.name.toLowerCase().includes(query);
+                const addressMatch = addr.address.toLowerCase().includes(query);
+                const words = query.split(' ');
+                const partialMatch = words.some(word => 
+                    word.length > 1 && addr.name.toLowerCase().includes(word)
+                );
+                
+                const isMatch = nameMatch || addressMatch || partialMatch;
+                if (isMatch) {
+                    console.log('Match found:', addr.name, 'for query:', query);
+                }
+                return isMatch;
+            });
             
             console.log('Found matches:', matches.length);
+            console.log('All matches:', matches.map(m => m.name));
             
             // Show dropdown
             if (matches.length > 0) {
@@ -311,7 +330,8 @@ function setupDemoAutocomplete() {
             } else {
                 dropdown.innerHTML = '<div style="padding: 10px; color: #666;">No addresses found</div>';
                 dropdown.style.display = 'block';
-                console.log('No matches found');
+                console.log('No matches found for:', query);
+                console.log('Available addresses:', sampleAddresses.map(a => a.name));
             }
         }, 300);
     });
