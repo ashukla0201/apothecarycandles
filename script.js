@@ -62,19 +62,25 @@ function updateCartUI() {
 
 // Add to cart
 function addToCart(name, price, image) {
+    console.log('addToCart function called with:', { name, price, image });
+    
     const existingItem = cart.find(item => item.name === name);
     
     if (existingItem) {
         existingItem.quantity += 1;
+        console.log('Updated existing item quantity:', existingItem);
     } else {
-        cart.push({
+        const newItem = {
             name: name,
             price: price,
             image: image,
             quantity: 1
-        });
+        };
+        cart.push(newItem);
+        console.log('Added new item to cart:', newItem);
     }
     
+    console.log('Cart after adding:', cart);
     saveCart();
     
     // Show success message
@@ -310,26 +316,54 @@ function payViaRazorpay() {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - Initializing Cart System');
+    
     // Initialize cart
     initCart();
     
     // Add to cart buttons
-    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-        button.addEventListener('click', function() {
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    console.log('Found Add to Cart buttons:', addToCartButtons.length);
+    
+    addToCartButtons.forEach((button, index) => {
+        console.log(`Button ${index}:`, button.dataset.name, button.dataset.price);
+        
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Add to Cart button clicked');
+            
             const name = this.dataset.name;
             const price = parseInt(this.dataset.price);
             const image = this.dataset.image;
+            
+            console.log('Adding to cart:', { name, price, image });
             addToCart(name, price, image);
         });
     });
     
     // Cart action buttons
-    document.getElementById('clear-cart').addEventListener('click', clearCart);
-    document.getElementById('checkout-btn').addEventListener('click', proceedToCheckout);
+    const clearCartBtn = document.getElementById('clear-cart');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    
+    if (clearCartBtn) {
+        clearCartBtn.addEventListener('click', clearCart);
+    }
+    
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', proceedToCheckout);
+    }
     
     // Checkout payment buttons
-    document.getElementById('pay-whatsapp').addEventListener('click', payViaWhatsApp);
-    document.getElementById('pay-razorpay').addEventListener('click', payViaRazorpay);
+    const payWhatsAppBtn = document.getElementById('pay-whatsapp');
+    const payRazorpayBtn = document.getElementById('pay-razorpay');
+    
+    if (payWhatsAppBtn) {
+        payWhatsAppBtn.addEventListener('click', payViaWhatsApp);
+    }
+    
+    if (payRazorpayBtn) {
+        payRazorpayBtn.addEventListener('click', payViaRazorpay);
+    }
     
     // Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
