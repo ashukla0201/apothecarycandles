@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showNotification('Your cart is empty!');
                 return;
             }
-            showNotification('Payment options are available above in the cart!');
+            proceedToCheckout();
         };
     }
 });
@@ -138,6 +138,8 @@ function updateCartDisplay() {
                 
                 console.log('Creating cart item HTML for:', item.name, 'index:', index);
                 console.log('Item details:', item);
+                console.log('Item price:', item.price, 'Quantity:', item.quantity, 'Item total:', itemTotal);
+                console.log('Running cart total:', total);
                 
                 const itemHTML = `
                     <div class="cart-item" style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center;">
@@ -161,20 +163,7 @@ function updateCartDisplay() {
                 console.log('Added quantity buttons for item:', item.name);
             });
             
-            // Add payment options after cart items
-            cartHTML += `
-                <div class="payment-section" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #eee;">
-                    <h4>Payment Options</h4>
-                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                        <button onclick="payViaWhatsApp()" class="btn-whatsapp" style="flex: 1; padding: 1rem; background: #25D366; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem;">
-                            💬 Order via WhatsApp
-                        </button>
-                        <button onclick="payViaRazorpay()" class="btn-razorpay" style="flex: 1; padding: 1rem; background: #3395ff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem;">
-                            💳 Pay Online
-                        </button>
-                    </div>
-                </div>
-            `;
+            console.log('Final cart total before display:', total);
             
             cartItems.innerHTML = cartHTML;
             cartTotal.textContent = total;
@@ -184,6 +173,62 @@ function updateCartDisplay() {
     } else {
         console.log('Cart display elements not found - cartItems:', !!cartItems, 'cartTotal:', !!cartTotal);
     }
+}
+
+// Proceed to checkout
+function proceedToCheckout() {
+    console.log('Proceeding to checkout...');
+    
+    if (cart.length === 0) {
+        showNotification('Your cart is empty!');
+        return;
+    }
+    
+    // Hide cart section, show checkout section
+    document.getElementById('cart').style.display = 'none';
+    document.getElementById('checkout').style.display = 'block';
+    
+    // Update checkout items
+    updateCheckoutUI();
+    
+    // Scroll to checkout
+    document.getElementById('checkout').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Update checkout UI
+function updateCheckoutUI() {
+    console.log('Updating checkout UI...');
+    
+    const checkoutItems = document.getElementById('checkout-items');
+    const checkoutTotal = document.getElementById('checkout-total');
+    
+    if (!checkoutItems || !checkoutTotal) {
+        console.log('Checkout elements not found');
+        return;
+    }
+    
+    let checkoutHTML = '';
+    let total = 0;
+    
+    cart.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        
+        checkoutHTML += `
+            <div class="checkout-item" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                <div>
+                    <div style="font-weight: bold;">${item.name}</div>
+                    <div style="color: #666; font-size: 0.9rem;">₹${item.price} × ${item.quantity}</div>
+                </div>
+                <div style="font-weight: bold; color: #28a745;">₹${itemTotal}</div>
+            </div>
+        `;
+    });
+    
+    checkoutItems.innerHTML = checkoutHTML;
+    checkoutTotal.textContent = total;
+    
+    console.log('Checkout UI updated with total:', total);
 }
 
 // Update quantity
@@ -278,6 +323,7 @@ window.removeItem = removeItem;
 window.updateCartDisplay = updateCartDisplay;
 window.updateQuantity = updateQuantity;
 window.setQuantity = setQuantity;
+window.proceedToCheckout = proceedToCheckout;
 window.payViaWhatsApp = payViaWhatsApp;
 window.payViaRazorpay = payViaRazorpay;
 
@@ -289,25 +335,26 @@ function payViaWhatsApp() {
         return;
     }
     
-    console.log('Collecting customer details...');
-    // Get customer details
-    const customerName = prompt('Please enter your name:');
-    console.log('Customer name:', customerName);
-    if (!customerName) return;
+    console.log('Getting customer details from checkout form...');
+    // Get customer details from checkout form
+    const customerName = document.getElementById('customer-name').value;
+    const customerEmail = document.getElementById('customer-email').value;
+    const customerPhone = document.getElementById('customer-phone').value;
+    const customerAddress = document.getElementById('customer-address').value;
     
-    const customerPhone = prompt('Please enter your phone number:');
-    console.log('Customer phone:', customerPhone);
-    if (!customerPhone) return;
+    console.log('Customer details:', { customerName, customerEmail, customerPhone, customerAddress });
     
-    const customerAddress = prompt('Please enter your delivery address:');
-    console.log('Customer address:', customerAddress);
-    if (!customerAddress) return;
+    if (!customerName || !customerEmail || !customerPhone || !customerAddress) {
+        showNotification('Please fill in all customer details!');
+        return;
+    }
     
     console.log('Creating WhatsApp message...');
     // Create order message
     let orderMessage = `🕯️ *New Order - Apothecary Candles*%0A%0A`;
     orderMessage += `*Customer Details:*%0A`;
     orderMessage += `• Name: ${customerName}%0A`;
+    orderMessage += `• Email: ${customerEmail}%0A`;
     orderMessage += `• Phone: ${customerPhone}%0A`;
     orderMessage += `• Address: ${customerAddress}%0A%0A`;
     orderMessage += `*Order Items:*%0A`;
@@ -334,19 +381,19 @@ function payViaRazorpay() {
         return;
     }
     
-    console.log('Collecting customer details for Razorpay...');
-    // Get customer details
-    const customerName = prompt('Please enter your name:');
-    console.log('Customer name:', customerName);
-    if (!customerName) return;
+    console.log('Getting customer details from checkout form for Razorpay...');
+    // Get customer details from checkout form
+    const customerName = document.getElementById('customer-name').value;
+    const customerEmail = document.getElementById('customer-email').value;
+    const customerPhone = document.getElementById('customer-phone').value;
+    const customerAddress = document.getElementById('customer-address').value;
     
-    const customerPhone = prompt('Please enter your phone number:');
-    console.log('Customer phone:', customerPhone);
-    if (!customerPhone) return;
+    console.log('Customer details:', { customerName, customerEmail, customerPhone, customerAddress });
     
-    const customerAddress = prompt('Please enter your delivery address:');
-    console.log('Customer address:', customerAddress);
-    if (!customerAddress) return;
+    if (!customerName || !customerEmail || !customerPhone || !customerAddress) {
+        showNotification('Please fill in all customer details!');
+        return;
+    }
     
     console.log('Initializing Razorpay payment...');
     // Calculate total amount in paise
@@ -372,6 +419,7 @@ function payViaRazorpay() {
             let confirmationMessage = `✅ *Payment Confirmed*%0A%0A`;
             confirmationMessage += `*Customer Details:*%0A`;
             confirmationMessage += `• Name: ${customerName}%0A`;
+            confirmationMessage += `• Email: ${customerEmail}%0A`;
             confirmationMessage += `• Phone: ${customerPhone}%0A`;
             confirmationMessage += `• Address: ${customerAddress}%0A%0A`;
             confirmationMessage += `*Payment Details:*%0A`;
@@ -393,10 +441,12 @@ function payViaRazorpay() {
         },
         prefill: {
             name: customerName,
+            email: customerEmail,
             contact: customerPhone
         },
         notes: {
             customer_name: customerName,
+            customer_email: customerEmail,
             customer_phone: customerPhone,
             customer_address: customerAddress,
             items: orderItems
