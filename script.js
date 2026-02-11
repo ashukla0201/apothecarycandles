@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showNotification('Your cart is empty!');
                 return;
             }
-            showNotification('Proceeding to checkout (checkout page to be implemented)');
+            showNotification('Payment options are available above in the cart!');
         };
     }
 });
@@ -246,21 +246,27 @@ window.payViaRazorpay = payViaRazorpay;
 
 // Payment functions
 function payViaWhatsApp() {
+    console.log('payViaWhatsApp called');
     if (cart.length === 0) {
         showNotification('Your cart is empty!');
         return;
     }
     
+    console.log('Collecting customer details...');
     // Get customer details
     const customerName = prompt('Please enter your name:');
+    console.log('Customer name:', customerName);
     if (!customerName) return;
     
     const customerPhone = prompt('Please enter your phone number:');
+    console.log('Customer phone:', customerPhone);
     if (!customerPhone) return;
     
     const customerAddress = prompt('Please enter your delivery address:');
+    console.log('Customer address:', customerAddress);
     if (!customerAddress) return;
     
+    console.log('Creating WhatsApp message...');
     // Create order message
     let orderMessage = `🕯️ *New Order - Apothecary Candles*%0A%0A`;
     orderMessage += `*Customer Details:*%0A`;
@@ -279,26 +285,33 @@ function payViaWhatsApp() {
     orderMessage += `%0A*Total: ₹${total}*%0A%0A`;
     orderMessage += `Please confirm the order and payment details.`;
     
+    console.log('Opening WhatsApp...');
     const whatsappUrl = `https://wa.me/919956394794?text=${orderMessage}`;
     window.open(whatsappUrl, '_blank');
 }
 
 function payViaRazorpay() {
+    console.log('payViaRazorpay called');
     if (cart.length === 0) {
         showNotification('Your cart is empty!');
         return;
     }
     
+    console.log('Collecting customer details for Razorpay...');
     // Get customer details
     const customerName = prompt('Please enter your name:');
+    console.log('Customer name:', customerName);
     if (!customerName) return;
     
     const customerPhone = prompt('Please enter your phone number:');
+    console.log('Customer phone:', customerPhone);
     if (!customerPhone) return;
     
     const customerAddress = prompt('Please enter your delivery address:');
+    console.log('Customer address:', customerAddress);
     if (!customerAddress) return;
     
+    console.log('Initializing Razorpay payment...');
     // Calculate total amount in paise
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const amountInPaise = total * 100;
@@ -315,6 +328,7 @@ function payViaRazorpay() {
         image: 'https://ashukla0201.github.io/apothecarycandles/logo.jpeg',
         handler: function (response) {
             // Payment successful
+            console.log('Payment successful:', response);
             showNotification(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
             
             // Send order confirmation via WhatsApp
@@ -378,6 +392,7 @@ function payViaRazorpay() {
         }
     };
     
+    console.log('Opening Razorpay modal...');
     const rzp = new Razorpay(options);
     rzp.open();
 }
