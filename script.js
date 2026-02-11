@@ -23,40 +23,46 @@ function updateCartUI() {
     const cartTotal = document.getElementById('cart-total');
     
     // Update cart count
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartCount.textContent = totalItems;
+    if (cartCount) {
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartCount.textContent = totalItems;
+        console.log('Updated cart count to:', totalItems);
+    }
     
     // Update cart items
-    if (cart.length === 0) {
-        cartItems.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
-        cartTotal.textContent = '0';
-    } else {
-        let cartHTML = '';
-        let total = 0;
-        
-        cart.forEach((item, index) => {
-            const itemTotal = item.price * item.quantity;
-            total += itemTotal;
+    if (cartItems && cartTotal) {
+        if (cart.length === 0) {
+            cartItems.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+            cartTotal.textContent = '0';
+        } else {
+            let cartHTML = '';
+            let total = 0;
             
-            cartHTML += `
-                <div class="cart-item">
-                    <img src="${item.image}" alt="${item.name}">
-                    <div class="cart-item-details">
-                        <div class="cart-item-name">${item.name}</div>
-                        <div class="cart-item-price">₹${item.price}</div>
-                        <div class="cart-item-quantity">
-                            <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
-                            <span>${item.quantity}</span>
-                            <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                cartHTML += `
+                    <div class="cart-item">
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">₹${item.price}</div>
+                            <div class="cart-item-quantity">
+                                <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
+                                <span>${item.quantity}</span>
+                                <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
+                            </div>
                         </div>
+                        <button class="remove-item" onclick="removeFromCart(${index})">Remove</button>
                     </div>
-                    <button class="remove-item" onclick="removeFromCart(${index})">Remove</button>
-                </div>
-            `;
-        });
-        
-        cartItems.innerHTML = cartHTML;
-        cartTotal.textContent = total;
+                `;
+            });
+            
+            cartItems.innerHTML = cartHTML;
+            cartTotal.textContent = total;
+            console.log('Updated cart display with total:', total);
+        }
     }
 }
 
@@ -115,6 +121,8 @@ function clearCart() {
 
 // Show notification
 function showNotification(message) {
+    console.log('Showing notification:', message);
+    
     // Create notification element
     const notification = document.createElement('div');
     notification.className = 'notification';
@@ -129,15 +137,32 @@ function showNotification(message) {
         border-radius: 5px;
         z-index: 10000;
         animation: slideIn 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     `;
     
     document.body.appendChild(notification);
     
     // Remove after 3 seconds
     setTimeout(() => {
-        notification.remove();
+        if (notification.parentNode) {
+            notification.remove();
+        }
     }, 3000);
 }
+
+// Test function - call this to test if cart works
+function testCart() {
+    console.log('Testing cart functionality...');
+    addToCart('Test Candle', 100, 'candle1.jpg');
+}
+
+// Make functions globally accessible
+window.addToCart = addToCart;
+window.updateQuantity = updateQuantity;
+window.removeFromCart = removeFromCart;
+window.clearCart = clearCart;
+window.showNotification = showNotification;
+window.testCart = testCart;
 
 // Checkout functionality
 function proceedToCheckout() {
