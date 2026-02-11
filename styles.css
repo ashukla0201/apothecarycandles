@@ -82,6 +82,14 @@ nav {
     background-color: #fafafa;
 }
 
+@media (max-width: 768px) {
+    .hero {
+        background: linear-gradient(rgba(139, 115, 85, 0.3), rgba(139, 115, 85, 0.3)),
+                    url('logo.jpeg') right/contain no-repeat;
+        background-color: #fafafa;
+    }
+}
+
 .hero-content {
     display: grid;
     grid-template-columns: 1fr;
@@ -418,17 +426,30 @@ footer p {
         text-align: center;
     }
     
+    .hero {
+        background: linear-gradient(rgba(139, 115, 85, 0.3), rgba(139, 115, 85, 0.3)),
+                    url('logo.jpeg') right/contain no-repeat;
+        background-color: #fafafa;
+    }
+    
     .hero-content {
         grid-template-columns: 1fr;
         grid-template-rows: auto auto;
         text-align: center;
         gap: 1.5rem;
+        max-width: 90%;
+        padding: 0 1rem;
     }
     
     .hero-left {
         grid-column: 1;
         grid-row: 1;
         text-align: center;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 2rem 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        max-width: 100%;
     }
     
     .hero-bottom {
@@ -437,11 +458,11 @@ footer p {
     }
     
     .hero-left h1 {
-        font-size: 3rem;
+        font-size: 2.5rem;
     }
     
     .hero-left p {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         margin-bottom: 1.5rem;
     }
     
