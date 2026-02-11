@@ -428,8 +428,9 @@ footer p {
     
     .hero {
         background: linear-gradient(rgba(139, 115, 85, 0.3), rgba(139, 115, 85, 0.3)),
-                    url('logo.jpeg') right/contain no-repeat;
+                    url('logo.jpeg') center/contain no-repeat;
         background-color: #fafafa;
+        background-position: center 30%;
     }
     
     .hero-content {
@@ -439,6 +440,8 @@ footer p {
         gap: 1.5rem;
         max-width: 90%;
         padding: 0 1rem;
+        position: relative;
+        z-index: 1;
     }
     
     .hero-left {
@@ -450,11 +453,16 @@ footer p {
         border-radius: 15px;
         box-shadow: 0 8px 25px rgba(0,0,0,0.2);
         max-width: 100%;
+        position: relative;
+        z-index: 2;
+        margin-top: 25vh;
     }
     
     .hero-bottom {
         grid-column: 1;
         grid-row: 2;
+        position: relative;
+        z-index: 2;
     }
     
     .hero-left h1 {
