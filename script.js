@@ -1,9 +1,14 @@
+// Test if JavaScript is loading
+console.log('script.js is loading!');
+alert('JavaScript is working!');
+
 // Simple Cart System
 let cart = [];
 
 // Initialize cart when page loads
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Page loaded - setting up cart');
+    alert('DOM Content Loaded!');
     
     // Load cart from localStorage
     const savedCart = localStorage.getItem('apothecaryCart');
@@ -15,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup all Add to Cart buttons
     const buttons = document.querySelectorAll('.add-to-cart-btn');
     console.log('Found buttons:', buttons.length);
+    alert(`Found ${buttons.length} Add to Cart buttons`);
     
     buttons.forEach((button, index) => {
         console.log(`Setting up button ${index}:`, button.dataset.name);
@@ -22,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         button.onclick = function(e) {
             e.preventDefault();
             console.log('Button clicked!');
+            alert('Button was clicked!');
             
             const name = this.dataset.name;
             const price = parseInt(this.dataset.price);
