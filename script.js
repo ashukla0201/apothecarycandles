@@ -123,7 +123,65 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize button states on page load
     updateAddToCartButtons();
+    
+    // Setup lightbox functionality
+    setupLightbox();
 });
+
+// Setup lightbox functionality
+function setupLightbox() {
+    console.log('Setting up lightbox functionality...');
+    
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.querySelector('.lightbox-caption');
+    const lightboxClose = document.querySelector('.lightbox-close');
+    
+    if (!lightbox || !lightboxImg || !lightboxClose) {
+        console.log('Lightbox elements not found');
+        return;
+    }
+    
+    // Add click event to all product images
+    const productImages = document.querySelectorAll('.product-image img');
+    productImages.forEach(img => {
+        img.style.cursor = 'pointer';
+        img.onclick = function() {
+            console.log('Opening lightbox for image:', this.src);
+            lightbox.style.display = 'block';
+            lightboxImg.src = this.src;
+            
+            // Get caption from product name
+            const productCard = this.closest('.product-card');
+            const productName = productCard ? productCard.querySelector('h3').textContent : '';
+            lightboxCaption.textContent = productName;
+        };
+    });
+    
+    // Close lightbox when clicking the close button
+    lightboxClose.onclick = function() {
+        console.log('Closing lightbox via close button');
+        lightbox.style.display = 'none';
+    };
+    
+    // Close lightbox when clicking outside the image
+    lightbox.onclick = function(event) {
+        if (event.target === lightbox) {
+            console.log('Closing lightbox via outside click');
+            lightbox.style.display = 'none';
+        }
+    };
+    
+    // Close lightbox when pressing Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && lightbox.style.display === 'block') {
+            console.log('Closing lightbox via Escape key');
+            lightbox.style.display = 'none';
+        }
+    });
+    
+    console.log('Lightbox setup complete');
+}
 
 // Update add to cart button states
 function updateAddToCartButtons() {
