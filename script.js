@@ -32,9 +32,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const image = this.dataset.image;
             
             console.log('Adding item:', { name, price, image });
+            console.log('Cart before add:', JSON.parse(JSON.stringify(cart)));
             
             // Check if item already exists in cart
             const existingItem = cart.find(item => item.name === name);
+            console.log('Existing item found:', existingItem);
             
             if (existingItem) {
                 // Increase quantity if item exists
