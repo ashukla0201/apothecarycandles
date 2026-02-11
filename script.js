@@ -78,7 +78,7 @@ document.querySelectorAll('.razorpay-payment').forEach(button => {
         const currency = productCard.dataset.currency;
         
         const options = {
-            key: 'rzp_test_1DP5mmOlF5G5ag', // Razorpay test key
+            key: 'rzp_test_SEtS6ZUfqY5eIv', // Your Razorpay test key
             amount: amount,
             currency: currency,
             name: 'Apothecary Candles',
