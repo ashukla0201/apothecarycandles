@@ -137,23 +137,26 @@ function updateCartDisplay() {
                 total += itemTotal;
                 
                 console.log('Creating cart item HTML for:', item.name, 'index:', index);
+                console.log('Item details:', item);
                 
-                cartHTML += `
-                    <div class="cart-item">
-                        <img src="${item.image}" alt="${item.name}">
-                        <div class="cart-item-details">
-                            <div class="cart-item-name">${item.name}</div>
-                            <div class="cart-item-price">₹${item.price}</div>
-                            <div class="cart-item-quantity" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                                <button class="quantity-btn" onclick="updateQuantity(${index}, -1)" style="background: #8b7355; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">−</button>
-                                <span class="quantity-value" style="font-weight: bold; min-width: 30px; text-align: center; font-size: 1.1rem; color: #333;">${item.quantity}</span>
-                                <button class="quantity-btn" onclick="updateQuantity(${index}, 1)" style="background: #8b7355; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">+</button>
+                const itemHTML = `
+                    <div class="cart-item" style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center;">
+                        <img src="${item.image}" alt="${item.name}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                        <div class="cart-item-details" style="flex: 1;">
+                            <div class="cart-item-name" style="font-weight: bold; margin-bottom: 0.5rem;">${item.name}</div>
+                            <div class="cart-item-price" style="color: #666; margin-bottom: 0.5rem;">₹${item.price}</div>
+                            <div class="cart-item-quantity" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; background: #f5f5f5; padding: 0.5rem; border-radius: 5px;">
+                                <button onclick="updateQuantity(${index}, -1)" style="background: #8b7355; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">−</button>
+                                <span style="font-weight: bold; min-width: 30px; text-align: center; font-size: 1.1rem; color: #333;">${item.quantity}</span>
+                                <button onclick="updateQuantity(${index}, 1)" style="background: #8b7355; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">+</button>
                             </div>
                         </div>
-                        <button class="remove-item" onclick="removeItem(${index})" style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Remove</button>
+                        <button onclick="removeItem(${index})" style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Remove</button>
                     </div>
                 `;
                 
+                cartHTML += itemHTML;
+                console.log('Added item HTML:', itemHTML.substring(0, 100) + '...');
                 console.log('Added quantity buttons for item:', item.name);
             });
             
