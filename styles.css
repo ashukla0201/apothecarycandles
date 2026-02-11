@@ -72,7 +72,7 @@ nav {
 .hero {
     height: 100vh;
     background: linear-gradient(rgba(139, 115, 85, 0.2), rgba(139, 115, 85, 0.2)),
-                url('logo.jpeg') center/contain no-repeat;
+                url('logo.jpeg') center center/contain no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -523,7 +523,7 @@ footer p {
     
     .hero {
         background: linear-gradient(rgba(139, 115, 85, 0.3), rgba(139, 115, 85, 0.3)),
-                    url('logo.jpeg') center/contain no-repeat;
+                    url('logo.jpeg') center center/contain no-repeat;
         background-color: #fafafa;
     }
     
