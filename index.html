@@ -25,6 +25,11 @@
                 <li><a href="#products">Products</a></li>
                 <li><a href="#story">Our Story</a></li>
                 <li><a href="#contact">Contact</a></li>
+                <li class="cart-link">
+                    <a href="#cart">
+                        🛒 Cart (<span id="cart-count">0</span>)
+                    </a>
+                </li>
             </ul>
         </nav>
     </header>
@@ -51,14 +56,12 @@
                         <h3>Lavender Dreams</h3>
                         <p class="product-description">Calming lavender with vanilla notes</p>
                         <p class="price">₹450</p>
-                        <div class="payment-buttons">
-                            <button class="buy-button whatsapp-order">Order via WhatsApp</button>
-                            <button class="buy-button razorpay-payment" 
-                                    data-amount="45000" 
-                                    data-currency="INR" 
-                                    data-product-name="Lavender Dreams"
-                                    data-product-description="Calming lavender with vanilla notes">
-                                Pay Now
+                        <div class="product-actions">
+                            <button class="add-to-cart-btn" 
+                                    data-name="Lavender Dreams" 
+                                    data-price="450" 
+                                    data-image="candle1.jpg">
+                                🛒 Add to Cart
                             </button>
                         </div>
                     </div>
@@ -315,6 +318,71 @@
                                     data-product-name="Green Tea"
                                     data-product-description="Calming green tea with mint">
                                 Pay Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Shopping Cart Section -->
+        <section id="cart" class="cart-section">
+            <div class="container">
+                <h2>Shopping Cart</h2>
+                <div id="cart-items" class="cart-items">
+                    <p class="empty-cart">Your cart is empty</p>
+                </div>
+                <div class="cart-summary">
+                    <div class="cart-total">
+                        <h3>Total: ₹<span id="cart-total">0</span></h3>
+                    </div>
+                    <div class="cart-actions">
+                        <button id="clear-cart" class="btn-secondary">Clear Cart</button>
+                        <button id="checkout-btn" class="btn-primary">Proceed to Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Checkout Section -->
+        <section id="checkout" class="checkout-section" style="display: none;">
+            <div class="container">
+                <h2>Checkout</h2>
+                <div class="checkout-content">
+                    <div class="checkout-form">
+                        <h3>Customer Details</h3>
+                        <form id="checkout-form">
+                            <div class="form-group">
+                                <label for="customer-name">Full Name</label>
+                                <input type="text" id="customer-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-email">Email</label>
+                                <input type="email" id="customer-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-phone">Phone Number</label>
+                                <input type="tel" id="customer-phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-address">Delivery Address</label>
+                                <textarea id="customer-address" rows="3" required></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="checkout-summary">
+                        <h3>Order Summary</h3>
+                        <div id="checkout-items" class="checkout-items"></div>
+                        <div class="checkout-total">
+                            <h4>Total: ₹<span id="checkout-total">0</span></h4>
+                        </div>
+                        <div class="payment-options">
+                            <h4>Payment Method</h4>
+                            <button id="pay-whatsapp" class="btn-whatsapp">
+                                💬 Order via WhatsApp
+                            </button>
+                            <button id="pay-razorpay" class="btn-razorpay">
+                                💳 Pay Online
                             </button>
                         </div>
                     </div>
