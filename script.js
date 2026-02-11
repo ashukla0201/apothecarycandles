@@ -13,7 +13,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Update cart display on load
-    updateCartDisplay();
+    setTimeout(() => {
+        updateCartDisplay();
+        updateCartCounter();
+    }, 100);
     
     // Setup all Add to Cart buttons
     const buttons = document.querySelectorAll('.add-to-cart-btn');
@@ -41,14 +44,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Save to localStorage
             localStorage.setItem('apothecaryCart', JSON.stringify(cart));
             
+            console.log('Cart after adding:', cart);
+            
             // Update cart counter and display
             updateCartCounter();
             updateCartDisplay();
             
             // Show success message
             showNotification(`${name} added to cart!`);
-            
-            console.log('Cart now:', cart);
         };
     });
     
@@ -69,10 +72,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (checkoutBtn) {
         checkoutBtn.onclick = function() {
             if (cart.length === 0) {
-                alert('Your cart is empty!');
+                showNotification('Your cart is empty!');
                 return;
             }
-            alert('Proceeding to checkout (checkout page to be implemented)');
+            showNotification('Proceeding to checkout (checkout page to be implemented)');
         };
     }
 });
@@ -190,7 +193,7 @@ window.payViaRazorpay = payViaRazorpay;
 // Payment functions
 function payViaWhatsApp() {
     if (cart.length === 0) {
-        alert('Your cart is empty!');
+        showNotification('Your cart is empty!');
         return;
     }
     
@@ -218,7 +221,7 @@ function payViaWhatsApp() {
 
 function payViaRazorpay() {
     if (cart.length === 0) {
-        alert('Your cart is empty!');
+        showNotification('Your cart is empty!');
         return;
     }
     
@@ -238,7 +241,7 @@ function payViaRazorpay() {
         image: 'https://ashukla0201.github.io/apothecarycandles/logo.jpeg',
         handler: function (response) {
             // Payment successful
-            alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+            showNotification(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
             
             // Send order confirmation via WhatsApp
             let confirmationMessage = `✅ *Payment Confirmed*%0A%0A`;
