@@ -93,7 +93,7 @@ nav {
 .hero-content {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
     gap: 2rem;
     max-width: 800px;
     width: 100%;
@@ -106,9 +106,22 @@ nav {
     transform: translate(-50%, -50%);
 }
 
-.hero-left {
+.hero-mobile-logo {
     grid-column: 1;
     grid-row: 1;
+    display: none;
+}
+
+.mobile-logo {
+    max-width: 200px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.15));
+}
+
+.hero-left {
+    grid-column: 1;
+    grid-row: 2;
     text-align: center;
     align-self: center;
     background: rgba(255, 255, 255, 0.9);
@@ -120,7 +133,7 @@ nav {
 
 .hero-bottom {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 3;
     text-align: center;
     justify-self: center;
 }
@@ -427,26 +440,38 @@ footer p {
     }
     
     .hero {
-        background: linear-gradient(rgba(139, 115, 85, 0.3), rgba(139, 115, 85, 0.3)),
-                    url('logo.jpeg') center/contain no-repeat;
-        background-color: #fafafa;
-        background-position: center 30%;
+        background: linear-gradient(rgba(139, 115, 85, 0.1), rgba(139, 115, 85, 0.1)),
+                    #fafafa;
     }
     
     .hero-content {
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto;
+        grid-template-rows: auto auto auto;
         text-align: center;
         gap: 1.5rem;
         max-width: 90%;
         padding: 0 1rem;
         position: relative;
         z-index: 1;
+        transform: translate(-50%, -50%);
+    }
+    
+    .hero-mobile-logo {
+        grid-column: 1;
+        grid-row: 1;
+        display: block;
+        text-align: center;
+    }
+    
+    .mobile-logo {
+        max-width: 180px;
+        height: auto;
+        margin-bottom: 1rem;
     }
     
     .hero-left {
         grid-column: 1;
-        grid-row: 1;
+        grid-row: 2;
         text-align: center;
         background: rgba(255, 255, 255, 0.95);
         padding: 2rem 1.5rem;
@@ -455,12 +480,11 @@ footer p {
         max-width: 100%;
         position: relative;
         z-index: 2;
-        margin-top: 25vh;
     }
     
     .hero-bottom {
         grid-column: 1;
-        grid-row: 2;
+        grid-row: 3;
         position: relative;
         z-index: 2;
     }
@@ -472,10 +496,6 @@ footer p {
     .hero-left p {
         font-size: 1.5rem;
         margin-bottom: 1.5rem;
-    }
-    
-    .hero-logo {
-        max-width: 200px;
     }
     
     .products-grid {
