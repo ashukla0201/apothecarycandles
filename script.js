@@ -74,6 +74,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update cart counter and display
             updateCartCounter();
             updateCartDisplay();
+            
+            // Update button states
+            updateAddToCartButtons();
         };
     });
     
@@ -87,6 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('apothecaryCart', JSON.stringify(cart));
             updateCartCounter();
             updateCartDisplay();
+            updateAddToCartButtons(); // Update button states when cart is cleared
             showNotification('Cart cleared!');
         };
     }
@@ -116,7 +120,27 @@ document.addEventListener('DOMContentLoaded', function() {
             processRazorpayPayment();
         };
     }
+    
+    // Initialize button states on page load
+    updateAddToCartButtons();
 });
+
+// Update add to cart button states
+function updateAddToCartButtons() {
+    const buttons = document.querySelectorAll('.add-to-cart-btn');
+    buttons.forEach(button => {
+        const productName = button.getAttribute('data-name');
+        const isInCart = cart.some(item => item.name === productName);
+        
+        if (isInCart) {
+            button.classList.add('added');
+            button.textContent = 'Added to Cart';
+        } else {
+            button.classList.remove('added');
+            button.textContent = 'Add to Cart';
+        }
+    });
+}
 
 // Update cart counter
 function updateCartCounter() {
@@ -385,6 +409,7 @@ window.setQuantity = setQuantity;
 window.proceedToCheckout = proceedToCheckout;
 window.backToCart = backToCart;
 window.validateCustomerDetails = validateCustomerDetails;
+window.updateAddToCartButtons = updateAddToCartButtons;
 window.payViaWhatsApp = payViaWhatsApp;
 window.payViaRazorpay = payViaRazorpay;
 window.processWhatsAppPayment = processWhatsAppPayment;
