@@ -71,7 +71,8 @@ nav {
 /* Hero Section */
 .hero {
     height: 100vh;
-    background: linear-gradient(rgba(139, 115, 85, 0.2), rgba(139, 115, 85, 0.2)),
+    background: linear-gradient(to right, rgba(144, 238, 144, 0.3) 0%, rgba(144, 238, 144, 0.1) 30%, transparent 50%),
+                linear-gradient(rgba(139, 115, 85, 0.2), rgba(139, 115, 85, 0.2)),
                 url('logo.jpeg') center center/contain no-repeat;
     display: flex;
     align-items: center;
@@ -522,7 +523,8 @@ footer p {
     }
     
     .hero {
-        background: linear-gradient(rgba(139, 115, 85, 0.3), rgba(139, 115, 85, 0.3)),
+        background: linear-gradient(to right, rgba(144, 238, 144, 0.3) 0%, rgba(144, 238, 144, 0.1) 30%, transparent 50%),
+                    linear-gradient(rgba(139, 115, 85, 0.3), rgba(139, 115, 85, 0.3)),
                     url('logo.jpeg') center center/contain no-repeat;
         background-color: #fafafa;
     }
