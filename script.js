@@ -221,6 +221,8 @@ function setupDemoAutocomplete() {
         return;
     }
     
+    console.log('Address input found:', addressInput);
+    
     // Sample addresses for demo
     const sampleAddresses = [
         { name: 'Vaishno Silver Bells', address: 'Vaishno Silver Bells, Sector 12, Dwarka, Delhi, 110075', pincode: '110075' },
@@ -238,45 +240,52 @@ function setupDemoAutocomplete() {
     let currentTimeout;
     
     // Create dropdown container
-    const dropdown = document.createElement('div');
-    dropdown.id = 'address-dropdown';
-    dropdown.style.cssText = `
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: white;
-        border: 1px solid #ddd;
-        border-top: none;
-        border-radius: 0 0 5px 5px;
-        max-height: 200px;
-        overflow-y: auto;
-        z-index: 1000;
-        display: none;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    `;
-    
-    addressInput.parentNode.style.position = 'relative';
-    addressInput.parentNode.appendChild(dropdown);
+    let dropdown = document.getElementById('address-dropdown');
+    if (!dropdown) {
+        dropdown = document.createElement('div');
+        dropdown.id = 'address-dropdown';
+        dropdown.style.cssText = `
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        `;
+        addressInput.parentNode.style.position = 'relative';
+        addressInput.parentNode.appendChild(dropdown);
+        console.log('Dropdown created and added');
+    }
     
     // Handle input
     addressInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
+        console.log('Input changed:', query);
         
         clearTimeout(currentTimeout);
         
         if (query.length < 2) {
             dropdown.style.display = 'none';
             loadingIndicator.style.display = 'none';
+            console.log('Query too short, hiding dropdown');
             return;
         }
         
         // Show loading
         loadingIndicator.style.display = 'block';
+        console.log('Showing loading indicator');
         
         // Simulate API delay
         currentTimeout = setTimeout(() => {
             loadingIndicator.style.display = 'none';
+            console.log('Searching for:', query);
             
             // Filter addresses
             const matches = sampleAddresses.filter(addr => 
@@ -284,10 +293,12 @@ function setupDemoAutocomplete() {
                 addr.address.toLowerCase().includes(query)
             );
             
+            console.log('Found matches:', matches.length);
+            
             // Show dropdown
             if (matches.length > 0) {
                 dropdown.innerHTML = matches.map(addr => `
-                    <div style="padding: 10px; border-bottom: 1px solid #f0f0f0; cursor: pointer; hover:background-color:#f8f9fa;" 
+                    <div style="padding: 10px; border-bottom: 1px solid #f0f0f0; cursor: pointer;" 
                          onmouseover="this.style.backgroundColor='#f8f9fa'" 
                          onmouseout="this.style.backgroundColor='white'"
                          onclick="selectAddress('${addr.address.replace(/'/g, "\\'")}', '${addr.pincode}')">
@@ -296,9 +307,11 @@ function setupDemoAutocomplete() {
                     </div>
                 `).join('');
                 dropdown.style.display = 'block';
+                console.log('Dropdown shown with', matches.length, 'results');
             } else {
                 dropdown.innerHTML = '<div style="padding: 10px; color: #666;">No addresses found</div>';
                 dropdown.style.display = 'block';
+                console.log('No matches found');
             }
         }, 300);
     });
@@ -307,6 +320,7 @@ function setupDemoAutocomplete() {
     document.addEventListener('click', function(e) {
         if (!addressInput.contains(e.target) && !dropdown.contains(e.target)) {
             dropdown.style.display = 'none';
+            console.log('Clicked outside, hiding dropdown');
         }
     });
     
