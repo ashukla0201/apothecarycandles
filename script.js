@@ -1,14 +1,9 @@
-// Test if JavaScript is loading
-console.log('script.js is loading!');
-alert('JavaScript is working!');
-
 // Simple Cart System
 let cart = [];
 
 // Initialize cart when page loads
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Page loaded - setting up cart');
-    alert('DOM Content Loaded!');
     
     // Load cart from localStorage
     const savedCart = localStorage.getItem('apothecaryCart');
@@ -17,18 +12,17 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Loaded cart from storage:', cart);
     }
     
+    // Update cart display on load
+    updateCartDisplay();
+    
     // Setup all Add to Cart buttons
     const buttons = document.querySelectorAll('.add-to-cart-btn');
     console.log('Found buttons:', buttons.length);
-    alert(`Found ${buttons.length} Add to Cart buttons`);
     
     buttons.forEach((button, index) => {
-        console.log(`Setting up button ${index}:`, button.dataset.name);
-        
         button.onclick = function(e) {
             e.preventDefault();
             console.log('Button clicked!');
-            alert('Button was clicked!');
             
             const name = this.dataset.name;
             const price = parseInt(this.dataset.price);
@@ -47,28 +41,132 @@ document.addEventListener('DOMContentLoaded', function() {
             // Save to localStorage
             localStorage.setItem('apothecaryCart', JSON.stringify(cart));
             
-            // Update cart counter
-            const cartCount = document.getElementById('cart-count');
-            if (cartCount) {
-                cartCount.textContent = cart.length;
-                console.log('Updated cart count to:', cart.length);
-            }
+            // Update cart counter and display
+            updateCartCounter();
+            updateCartDisplay();
             
-            // Show simple alert
-            alert(`${name} added to cart! Total items: ${cart.length}`);
+            // Show success message
+            showNotification(`${name} added to cart!`);
             
             console.log('Cart now:', cart);
         };
     });
+    
+    // Setup cart action buttons
+    const clearCartBtn = document.getElementById('clear-cart');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    
+    if (clearCartBtn) {
+        clearCartBtn.onclick = function() {
+            cart = [];
+            localStorage.setItem('apothecaryCart', JSON.stringify(cart));
+            updateCartCounter();
+            updateCartDisplay();
+            showNotification('Cart cleared!');
+        };
+    }
+    
+    if (checkoutBtn) {
+        checkoutBtn.onclick = function() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            alert('Proceeding to checkout (checkout page to be implemented)');
+        };
+    }
 });
 
-// Make functions available globally
-window.updateCartCount = function() {
+// Update cart counter
+function updateCartCounter() {
     const cartCount = document.getElementById('cart-count');
     if (cartCount) {
         cartCount.textContent = cart.length;
+        console.log('Updated cart count to:', cart.length);
     }
-};
+}
+
+// Update cart display
+function updateCartDisplay() {
+    const cartItems = document.getElementById('cart-items');
+    const cartTotal = document.getElementById('cart-total');
+    
+    console.log('Updating cart display, cart length:', cart.length);
+    
+    if (cartItems && cartTotal) {
+        if (cart.length === 0) {
+            cartItems.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+            cartTotal.textContent = '0';
+            console.log('Cart is empty, showing empty message');
+        } else {
+            let cartHTML = '';
+            let total = 0;
+            
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                cartHTML += `
+                    <div class="cart-item">
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">₹${item.price}</div>
+                            <div class="cart-item-quantity">
+                                <span>Quantity: ${item.quantity}</span>
+                            </div>
+                        </div>
+                        <button class="remove-item" onclick="removeItem(${index})">Remove</button>
+                    </div>
+                `;
+            });
+            
+            cartItems.innerHTML = cartHTML;
+            cartTotal.textContent = total;
+            console.log('Updated cart display with total:', total);
+        }
+    } else {
+        console.log('Cart display elements not found');
+    }
+}
+
+// Remove item from cart
+function removeItem(index) {
+    const itemName = cart[index].name;
+    cart.splice(index, 1);
+    localStorage.setItem('apothecaryCart', JSON.stringify(cart));
+    updateCartCounter();
+    updateCartDisplay();
+    showNotification(`${itemName} removed from cart`);
+}
+
+// Show notification
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 5px;
+        z-index: 10000;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 3000);
+}
+
+// Make functions globally accessible
+window.removeItem = removeItem;
+window.updateCartDisplay = updateCartDisplay;
 
 // Checkout functionality
 function proceedToCheckout() {
