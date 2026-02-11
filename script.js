@@ -1029,37 +1029,51 @@ function setupPincodeStateDetection() {
     
     // Function to detect state from pincode
     function detectStateFromPincode(pincode) {
+        console.log('Detecting state for pincode:', pincode);
+        
         if (!pincode || pincode.length !== 6) {
+            console.log('Invalid pincode length or empty');
             return '';
         }
         
         // Try exact 3-digit match first
         const first3 = pincode.substring(0, 3);
+        console.log('Trying 3-digit match:', first3);
         if (pincodeStateMap[first3]) {
+            console.log('Found 3-digit match:', pincodeStateMap[first3]);
             return pincodeStateMap[first3];
         }
         
         // Try exact 2-digit match
         const first2 = pincode.substring(0, 2);
+        console.log('Trying 2-digit match:', first2);
         if (pincodeStateMap[first2]) {
+            console.log('Found 2-digit match:', pincodeStateMap[first2]);
             return pincodeStateMap[first2];
         }
         
         // Try 1-digit match
         const first1 = pincode.substring(0, 1);
+        console.log('Trying 1-digit match:', first1);
         if (pincodeStateMap[first1]) {
+            console.log('Found 1-digit match:', pincodeStateMap[first1]);
             return pincodeStateMap[first1];
         }
         
+        console.log('No match found for pincode:', pincode);
+        console.log('Available keys in map:', Object.keys(pincodeStateMap).slice(0, 20)); // Show first 20 keys
         return '';
     }
     
     // Add input event listener to pincode field
     pincodeInput.addEventListener('input', function() {
         const pincode = this.value.trim();
+        console.log('Pincode input changed:', pincode, 'Length:', pincode.length);
         
         if (pincode.length === 6) {
+            console.log('Pincode is 6 digits, detecting state...');
             const detectedState = detectStateFromPincode(pincode);
+            console.log('Detected state result:', detectedState);
             
             if (detectedState) {
                 stateInput.value = detectedState;
